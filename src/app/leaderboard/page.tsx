@@ -31,7 +31,7 @@ export default async function LeaderboardPage() {
         </div>
 
         <div className="space-y-3">
-          {users.map((user, i) => (
+          {users.map((user: any, i: number) => (
             <div
               key={user.id}
               className="flex items-center justify-between bg-zinc-900/40 border border-white/5 p-5 rounded-2xl hover:bg-zinc-900/60 hover:border-white/10 transition-all group"

@@ -33,7 +33,7 @@ export default async function ProblemsPage() {
       }
     });
     if (user) {
-      userSolvedIds = user.submissions.map(s => s.problemId);
+      userSolvedIds = user.submissions.map((s: any) => s.problemId);
       xp = user.xp;
       if (xp > 1000) userRank = "Gold III";
       else if (xp > 500) userRank = "Silver I";

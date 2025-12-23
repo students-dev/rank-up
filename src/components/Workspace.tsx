@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import Editor from "@monaco-editor/react";
 import ReactMarkdown from "react-markdown";
-import { Play, Send, Settings, Terminal, CheckCircle2, XCircle, Loader2, ChevronDown } from "lucide-react";
+import { Play, Send, Settings, Terminal, CheckCircle2, XCircle, Loader2, ChevronDown, History } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface WorkspaceProps {
@@ -30,7 +30,7 @@ const Workspace = ({ problem }: WorkspaceProps) => {
   const [results, setResults] = useState<any>(null);
   const [showConsole, setShowConsole] = useState(false);
 
-  const handleRun = async () => {
+  const handleExecute = async (isSubmit: boolean = false) => {
     setIsRunning(true);
     setShowConsole(true);
     try {
@@ -41,17 +41,18 @@ const Workspace = ({ problem }: WorkspaceProps) => {
           code,
           language,
           problemSlug: problem.slug,
+          isSubmit
         }),
       });
       const data = await response.json();
       setResults(data);
       
-      if (data.allPassed) {
+      if (data.allPassed && isSubmit) {
         confetti({
-          particleCount: 100,
-          spread: 70,
+          particleCount: 150,
+          spread: 100,
           origin: { y: 0.6 },
-          colors: ["#f97316", "#ffffff", "#3b82f6"]
+          colors: ["#f97316", "#ffffff", "#3b82f6", "#10b981"]
         });
       }
     } catch (error) {
@@ -85,7 +86,10 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                     : "border-transparent text-zinc-500 hover:text-zinc-300"
                 }`}
               >
-                Submissions
+                <div className="flex items-center gap-2">
+                    <History className="w-3 h-3" />
+                    Submissions
+                </div>
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-8 prose prose-invert max-w-none prose-p:text-zinc-400 prose-headings:text-white prose-strong:text-zinc-200">
@@ -156,7 +160,7 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                       </div>
                       <button onClick={() => setShowConsole(false)} className="text-zinc-500 hover:text-zinc-300 text-xs font-bold">Hide</button>
                     </div>
-                    <div className="flex-1 overflow-y-auto p-4 font-mono text-sm">
+                    <div className="flex-1 overflow-y-auto p-4 font-mono text-sm text-zinc-300">
                       {isRunning ? (
                         <div className="flex items-center gap-2 text-zinc-400">
                           <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
@@ -167,29 +171,32 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                           <div className="flex items-center gap-2">
                             {results.allPassed ? (
                               <span className="text-emerald-500 flex items-center gap-1.5 font-black uppercase text-xs tracking-widest">
-                                <CheckCircle2 className="w-4 h-4" /> All Test Cases Passed!
+                                <CheckCircle2 className="w-4 h-4" /> Passed!
                               </span>
                             ) : (
                               <span className="text-rose-500 flex items-center gap-1.5 font-black uppercase text-xs tracking-widest">
-                                <XCircle className="w-4 h-4" /> Some Test Cases Failed
+                                <XCircle className="w-4 h-4" /> Failed
                               </span>
                             )}
                           </div>
-                          {results.results.map((res: any, i: number) => (
+                          {results.results && results.results.map((res: any, i: number) => (
                             <div key={i} className={`p-4 rounded-xl border ${res.passed ? "bg-emerald-500/5 border-emerald-500/10" : "bg-rose-500/5 border-rose-500/10"}`}>
                               <div className="flex justify-between mb-3 text-[10px] font-black uppercase tracking-widest">
                                 <span className={res.passed ? "text-emerald-500" : "text-rose-500"}>Case {i + 1}: {res.passed ? "Passed" : "Failed"}</span>
                                 {res.runtime && <span className="text-zinc-600">{res.runtime}ms</span>}
                               </div>
-                              <div className="grid grid-cols-2 gap-4 text-xs font-medium">
-                                <pre className="bg-black/40 p-2.5 rounded-lg text-zinc-400 border border-white/5">{JSON.stringify(res.input)}</pre>
-                                <pre className="bg-black/40 p-2.5 rounded-lg text-zinc-400 border border-white/5">{JSON.stringify(res.expected)}</pre>
-                              </div>
+                              {res.input && (
+                                <div className="grid grid-cols-2 gap-4 text-xs font-medium">
+                                    <pre className="bg-black/40 p-2.5 rounded-lg text-zinc-400 border border-white/5">{JSON.stringify(res.input)}</pre>
+                                    <pre className="bg-black/40 p-2.5 rounded-lg text-zinc-400 border border-white/5">{JSON.stringify(res.expected)}</pre>
+                                </div>
+                              )}
+                              {res.message && <p className="text-zinc-500 text-xs italic">{res.message}</p>}
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div className="text-zinc-700 font-medium italic">Click "Run" to execute your code.</div>
+                        <div className="text-zinc-700 font-medium italic">Click "Run" to test or "Submit" to record progress.</div>
                       )}
                     </div>
                   </div>
@@ -200,15 +207,23 @@ const Workspace = ({ problem }: WorkspaceProps) => {
         </Panel>
       </PanelGroup>
 
-      <div className="border-t border-zinc-800 bg-zinc-900 p-3 flex justify-between items-center z-10">
+      <div className="border-t border-zinc-800 bg-zinc-900 p-3 flex justify-between items-center z-10 shadow-2xl">
         <button onClick={() => setShowConsole(!showConsole)} className="px-4 py-2 text-zinc-500 hover:text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
           <Terminal className="w-4 h-4" /> Console
         </button>
         <div className="flex gap-3">
-          <button onClick={handleRun} disabled={isRunning} className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/5 disabled:opacity-50 flex items-center gap-2">
+          <button 
+            onClick={() => handleExecute(false)} 
+            disabled={isRunning} 
+            className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/5 disabled:opacity-50 flex items-center gap-2 transition-all active:scale-95"
+          >
             {isRunning ? <Loader2 className="w-4 h-4 animate-spin text-orange-500" /> : <Play className="w-4 h-4 text-orange-500 fill-current" />} Run
           </button>
-          <button onClick={handleRun} className="px-8 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 flex items-center gap-2">
+          <button 
+            onClick={() => handleExecute(true)} 
+            disabled={isRunning}
+            className="px-8 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 flex items-center gap-2 transition-all active:scale-95"
+          >
             <Send className="w-4 h-4" /> Submit
           </button>
         </div>
