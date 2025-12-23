@@ -5,6 +5,8 @@ import { authOptions } from "@/lib/auth";
 
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions);
+    
     const posts = await prisma.post.findMany({
       include: {
         author: {
@@ -12,13 +14,25 @@ export async function GET() {
         },
         _count: {
           select: { comments: true }
-        }
+        },
+        votes: session?.user?.email ? {
+            where: {
+                user: { email: session.user.email }
+            },
+            select: { type: true }
+        } : false
       },
       orderBy: { createdAt: "desc" },
       take: 50
     });
 
-    return NextResponse.json(posts);
+    const formattedPosts = posts.map((post: any) => ({
+        ...post,
+        userVote: post.votes?.[0]?.type || null,
+        votes: undefined // remove the internal relation data
+    }));
+
+    return NextResponse.json(formattedPosts);
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
   }
