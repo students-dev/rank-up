@@ -43,6 +43,10 @@ model User {
   sessions      Session[]
   submissions   Submission[]
   rank          Int       @default(0)
+  xp            Int       @default(0)
+  streak        Int       @default(0)
+  lastSolved    DateTime?
+  badges        Json?     @default("[]")
 }
 
 model VerificationToken {

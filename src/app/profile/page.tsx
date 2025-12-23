@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Trophy, Calendar, Code, Star, Timer } from "lucide-react";
+import { Trophy, Calendar, Code, Star, Timer, Flame, Zap, Award } from "lucide-react";
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
@@ -25,95 +25,103 @@ export default async function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 font-sans">
+    <div className="max-w-6xl mx-auto px-6 py-12 font-sans bg-zinc-950">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* User Sidebar */}
         <div className="space-y-6">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 flex flex-col items-center text-center">
-            <div className="w-32 h-32 rounded-full border-4 border-orange-500 p-1 mb-6 shadow-xl shadow-orange-500/10">
+          <div className="bg-zinc-900 border border-white/5 rounded-[32px] p-8 flex flex-col items-center text-center relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-b from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            <div className="w-32 h-32 rounded-full border-4 border-orange-500 p-1 mb-6 relative z-10">
               <img
                 src={user.image || `https://ui-avatars.com/api/?name=${user.name}&background=18181b&color=f97316`}
                 alt={user.name!}
                 className="w-full h-full rounded-full object-cover"
               />
             </div>
-            <h1 className="text-2xl font-black mb-1 text-white">{user.name}</h1>
-            <p className="text-zinc-500 font-medium text-sm mb-6">{user.email}</p>
-            <div className="flex gap-4 w-full">
-              <div className="flex-1 bg-zinc-800/30 rounded-2xl p-4 border border-zinc-800">
-                <p className="text-zinc-600 text-[10px] uppercase font-black tracking-widest mb-1.5">Rank</p>
-                <p className="text-2xl font-black text-orange-500 tracking-tighter">#{user.rank || "---"}</p>
+            
+            <h1 className="text-2xl font-semibold mb-1 text-white relative z-10">{user.name}</h1>
+            <p className="text-zinc-500 text-sm mb-8 relative z-10">{user.email}</p>
+            
+            <div className="grid grid-cols-2 gap-4 w-full relative z-10">
+              <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
+                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1">Rank</p>
+                <p className="text-xl font-bold text-white">#{user.rank || "---"}</p>
               </div>
-              <div className="flex-1 bg-zinc-800/30 rounded-2xl p-4 border border-zinc-800">
-                <p className="text-zinc-600 text-[10px] uppercase font-black tracking-widest mb-1.5">Solved</p>
-                <p className="text-2xl font-black text-white tracking-tighter">0</p>
+              <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
+                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1">XP</p>
+                <p className="text-xl font-bold text-orange-500">{user.xp || 0}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-            <h3 className="font-black text-xs uppercase tracking-widest mb-6 flex items-center gap-2 text-zinc-400">
-              <Star className="w-4 h-4 text-orange-500" />
+          <div className="bg-zinc-900 border border-white/5 rounded-[32px] p-8 space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2">
+                <Flame className="w-4 h-4 text-orange-500 fill-current" />
+                Streak
+              </h3>
+              <span className="text-2xl font-bold text-white">{user.streak || 0} Days</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2">
+                <Zap className="w-4 h-4 text-blue-500 fill-current" />
+                Level
+              </h3>
+              <span className="text-2xl font-bold text-white">{Math.floor((user.xp || 0) / 1000) + 1}</span>
+            </div>
+          </div>
+
+          <div className="bg-zinc-900 border border-white/5 rounded-[32px] p-8">
+            <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-6 flex items-center gap-2">
+              <Award className="w-4 h-4 text-emerald-500" />
               Achievements
             </h3>
-            <div className="flex flex-wrap gap-2 text-zinc-600 italic text-xs font-medium px-2 py-4 border-2 border-dashed border-zinc-800 rounded-2xl text-center justify-center">
-              No badges earned yet. Solve problems to earn badges!
+            <div className="flex flex-wrap gap-3">
+               <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center opacity-20 grayscale transition-all hover:opacity-100 hover:grayscale-0 cursor-help" title="Early Adopter">
+                  <Star className="w-6 h-6 text-yellow-500" />
+               </div>
+               <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center opacity-20 grayscale" title="10 Problems Solved">
+                  <Code className="w-6 h-6 text-blue-500" />
+               </div>
+               <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center opacity-20 grayscale" title="First Streak">
+                  <Flame className="w-6 h-6 text-orange-500" />
+               </div>
             </div>
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl group hover:border-emerald-500/30 transition-colors">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="bg-emerald-500/10 p-2.5 rounded-xl group-hover:bg-emerald-500/20 transition-colors">
-                  <Code className="w-5 h-5 text-emerald-500" />
-                </div>
-                <h4 className="font-black text-xs uppercase tracking-widest text-zinc-400">Accuracy</h4>
-              </div>
-              <p className="text-4xl font-black text-white">0%</p>
-              <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mt-2">Global Average: 42%</p>
-            </div>
-            <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl group hover:border-blue-500/30 transition-colors">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="bg-blue-500/10 p-2.5 rounded-xl group-hover:bg-blue-500/20 transition-colors">
-                  <Timer className="w-5 h-5 text-blue-500" />
-                </div>
-                <h4 className="font-black text-xs uppercase tracking-widest text-zinc-400">Avg. Speed</h4>
-              </div>
-              <p className="text-4xl font-black text-white">--</p>
-              <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mt-2">Seconds per problem</p>
-            </div>
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
-            <div className="p-6 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
-              <h3 className="font-black text-xs uppercase tracking-widest flex items-center gap-2 text-zinc-400">
+          <div className="bg-zinc-900 border border-white/5 rounded-[32px] overflow-hidden">
+            <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+              <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-orange-500" />
                 Recent Submissions
               </h3>
             </div>
-            <div className="divide-y divide-zinc-800">
+            <div className="divide-y divide-white/5">
               {user.submissions.length > 0 ? (
                 user.submissions.map((sub: any) => (
-                  <div key={sub.id} className="p-6 flex justify-between items-center hover:bg-zinc-800/30 transition-colors group">
-                    <div>
-                      <h5 className="font-bold text-zinc-100 group-hover:text-orange-500 transition-colors">{sub.problem.title}</h5>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mt-2">
-                        {new Date(sub.createdAt).toLocaleDateString()} • {new Date(sub.createdAt).toLocaleTimeString()}
+                  <div key={sub.id} className="p-8 flex justify-between items-center hover:bg-white/[0.02] transition-colors group">
+                    <div className="space-y-1">
+                      <h5 className="font-semibold text-white group-hover:text-orange-500 transition-colors tracking-tight">{sub.problem.title}</h5>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-zinc-600">
+                        {new Date(sub.createdAt).toLocaleDateString()} at {new Date(sub.createdAt).toLocaleTimeString()}
                       </p>
                     </div>
-                    <span className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest ${
-                      sub.status === "Accepted" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                    }`}>
-                      {sub.status}
-                    </span>
+                    <div className="flex items-center gap-6">
+                        <span className="text-xs font-bold text-zinc-500">{sub.language.toUpperCase()}</span>
+                        <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
+                          sub.status === "Accepted" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                        }`}>
+                          {sub.status}
+                        </span>
+                    </div>
                   </div>
                 ))
               ) : (
-                <div className="p-20 text-center text-zinc-600 italic font-medium">
-                  No submissions yet. Start your journey today!
+                <div className="p-20 text-center space-y-4">
+                  <p className="text-zinc-600 italic font-medium">No submissions yet.</p>
+                  <button className="text-xs font-black uppercase tracking-widest text-white px-6 py-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all">Start Solving</button>
                 </div>
               )}
             </div>

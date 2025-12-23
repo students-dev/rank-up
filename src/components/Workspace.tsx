@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import Editor from "@monaco-editor/react";
 import ReactMarkdown from "react-markdown";
-import { Play, Send, Settings, Terminal, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { Play, Send, Settings, Terminal, CheckCircle2, XCircle, Loader2, ChevronDown } from "lucide-react";
+import confetti from "canvas-confetti";
 
 interface WorkspaceProps {
   problem: {
@@ -15,7 +16,14 @@ interface WorkspaceProps {
   };
 }
 
+const LANGUAGES = [
+  { id: "javascript", name: "JavaScript", icon: "JS" },
+  { id: "python", name: "Python", icon: "PY" },
+  { id: "java", name: "Java", icon: "JV" },
+];
+
 const Workspace = ({ problem }: WorkspaceProps) => {
+  const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState(problem.starterCode);
   const [activeTab, setActiveTab] = useState<"description" | "submissions">("description");
   const [isRunning, setIsRunning] = useState(false);
@@ -31,12 +39,21 @@ const Workspace = ({ problem }: WorkspaceProps) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           code,
-          language: "javascript",
+          language,
           problemSlug: problem.slug,
         }),
       });
       const data = await response.json();
       setResults(data);
+      
+      if (data.allPassed) {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ["#f97316", "#ffffff", "#3b82f6"]
+        });
+      }
     } catch (error) {
       console.error("Execution error:", error);
     } finally {
@@ -47,33 +64,32 @@ const Workspace = ({ problem }: WorkspaceProps) => {
   return (
     <div className="h-[calc(100vh-64px)] overflow-hidden bg-zinc-950 flex flex-col font-sans">
       <PanelGroup direction="horizontal">
-        {/* Left Panel: Problem Description */}
         <Panel defaultSize={40} minSize={25}>
           <div className="h-full flex flex-col bg-zinc-900/50 border-r border-zinc-800">
             <div className="flex gap-4 px-4 border-b border-zinc-800 bg-zinc-900">
               <button
                 onClick={() => setActiveTab("description")}
-                className={`py-3 text-sm font-medium border-b-2 transition-colors ${
+                className={`py-3 text-[11px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors ${
                   activeTab === "description"
                     ? "border-orange-500 text-orange-500"
-                    : "border-transparent text-zinc-400 hover:text-zinc-200"
+                    : "border-transparent text-zinc-500 hover:text-zinc-300"
                 }`}
               >
                 Description
               </button>
               <button
                 onClick={() => setActiveTab("submissions")}
-                className={`py-3 text-sm font-medium border-b-2 transition-colors ${
+                className={`py-3 text-[11px] font-black uppercase tracking-[0.2em] border-b-2 transition-colors ${
                   activeTab === "submissions"
                     ? "border-orange-500 text-orange-500"
-                    : "border-transparent text-zinc-400 hover:text-zinc-200"
+                    : "border-transparent text-zinc-500 hover:text-zinc-300"
                 }`}
               >
                 Submissions
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-6 prose prose-invert max-w-none">
-              <h2 className="text-2xl font-bold mb-4">{problem.title}</h2>
+            <div className="flex-1 overflow-y-auto p-8 prose prose-invert max-w-none prose-p:text-zinc-400 prose-headings:text-white prose-strong:text-zinc-200">
+              <h2 className="text-2xl font-bold mb-4 tracking-tight">{problem.title}</h2>
               <ReactMarkdown>{problem.description}</ReactMarkdown>
             </div>
           </div>
@@ -81,16 +97,29 @@ const Workspace = ({ problem }: WorkspaceProps) => {
 
         <PanelResizeHandle className="w-1 bg-zinc-800 hover:bg-orange-500/50 transition-colors cursor-col-resize" />
 
-        {/* Right Panel: Code Editor & Console */}
         <Panel defaultSize={60} minSize={30}>
           <PanelGroup direction="vertical">
             <Panel defaultSize={70} minSize={20}>
               <div className="h-full flex flex-col">
                 <div className="flex justify-between items-center px-4 py-2 border-b border-zinc-800 bg-zinc-900">
-                  <div className="flex items-center gap-2 text-sm text-zinc-400">
-                    <span className="bg-zinc-800 px-2 py-1 rounded border border-zinc-700 font-mono text-[10px]">index.js</span>
-                    <span className="text-zinc-600">/</span>
-                    <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">JavaScript</span>
+                  <div className="flex items-center gap-4">
+                    <div className="relative group">
+                      <button className="flex items-center gap-2 bg-zinc-800 px-3 py-1.5 rounded-lg border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-300 hover:bg-zinc-700 transition-colors">
+                        {LANGUAGES.find(l => l.id === language)?.name}
+                        <ChevronDown className="w-3 h-3" />
+                      </button>
+                      <div className="absolute top-full left-0 mt-1 w-40 bg-zinc-900 border border-white/5 rounded-xl shadow-2xl hidden group-hover:block z-50 overflow-hidden">
+                        {LANGUAGES.map((lang) => (
+                          <button
+                            key={lang.id}
+                            onClick={() => setLanguage(lang.id)}
+                            className="w-full text-left px-4 py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5 last:border-0"
+                          >
+                            {lang.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                   <Settings className="w-4 h-4 text-zinc-500 cursor-pointer hover:text-zinc-300" />
                 </div>
@@ -98,7 +127,7 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                 <div className="flex-1 bg-zinc-950">
                   <Editor
                     height="100%"
-                    defaultLanguage="javascript"
+                    language={language}
                     theme="vs-dark"
                     value={code}
                     onChange={(val) => setCode(val || "")}
@@ -109,11 +138,6 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                       scrollBeyondLastLine: false,
                       automaticLayout: true,
                       fontFamily: "var(--font-geist-mono)",
-                      lineNumbers: "on",
-                      glyphMargin: false,
-                      folding: true,
-                      lineDecorationsWidth: 10,
-                      lineNumbersMinChars: 3,
                     }}
                   />
                 </div>
@@ -130,12 +154,7 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                         <Terminal className="w-3.5 h-3.5" />
                         Console Output
                       </div>
-                      <button 
-                        onClick={() => setShowConsole(false)}
-                        className="text-zinc-500 hover:text-zinc-300 text-xs font-bold"
-                      >
-                        Hide
-                      </button>
+                      <button onClick={() => setShowConsole(false)} className="text-zinc-500 hover:text-zinc-300 text-xs font-bold">Hide</button>
                     </div>
                     <div className="flex-1 overflow-y-auto p-4 font-mono text-sm">
                       {isRunning ? (
@@ -158,44 +177,19 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                           </div>
                           {results.results.map((res: any, i: number) => (
                             <div key={i} className={`p-4 rounded-xl border ${res.passed ? "bg-emerald-500/5 border-emerald-500/10" : "bg-rose-500/5 border-rose-500/10"}`}>
-                              <div className="flex justify-between mb-3">
-                                <span className={`text-[10px] font-black uppercase tracking-widest ${res.passed ? "text-emerald-500" : "text-rose-500"}`}>
-                                  Case {i + 1}: {res.passed ? "Passed" : "Failed"}
-                                </span>
-                                {res.runtime && <span className="text-zinc-600 text-[10px] font-bold">{res.runtime}ms</span>}
+                              <div className="flex justify-between mb-3 text-[10px] font-black uppercase tracking-widest">
+                                <span className={res.passed ? "text-emerald-500" : "text-rose-500"}>Case {i + 1}: {res.passed ? "Passed" : "Failed"}</span>
+                                {res.runtime && <span className="text-zinc-600">{res.runtime}ms</span>}
                               </div>
-                              <div className="grid grid-cols-2 gap-4 text-xs">
-                                <div>
-                                  <p className="text-zinc-600 font-bold uppercase text-[9px] tracking-widest mb-1.5">Input</p>
-                                  <pre className="bg-black/40 p-2.5 rounded-lg text-zinc-400 overflow-x-auto border border-zinc-800/50">
-                                    {JSON.stringify(res.input)}
-                                  </pre>
-                                </div>
-                                <div>
-                                  <p className="text-zinc-600 font-bold uppercase text-[9px] tracking-widest mb-1.5">Expected</p>
-                                  <pre className="bg-black/40 p-2.5 rounded-lg text-zinc-400 overflow-x-auto border border-zinc-800/50">
-                                    {JSON.stringify(res.expected)}
-                                  </pre>
-                                </div>
+                              <div className="grid grid-cols-2 gap-4 text-xs font-medium">
+                                <pre className="bg-black/40 p-2.5 rounded-lg text-zinc-400 border border-white/5">{JSON.stringify(res.input)}</pre>
+                                <pre className="bg-black/40 p-2.5 rounded-lg text-zinc-400 border border-white/5">{JSON.stringify(res.expected)}</pre>
                               </div>
-                              {!res.passed && res.actual !== undefined && (
-                                <div className="mt-3">
-                                  <p className="text-rose-500/50 font-bold uppercase text-[9px] tracking-widest mb-1.5">Actual Output</p>
-                                  <pre className="bg-rose-500/10 p-2.5 rounded-lg text-rose-200 overflow-x-auto text-xs border border-rose-500/20">
-                                    {JSON.stringify(res.actual)}
-                                  </pre>
-                                </div>
-                              )}
-                              {res.error && (
-                                <div className="mt-3 p-3 bg-rose-500/10 rounded-lg border border-rose-500/20 text-rose-400 text-xs font-medium">
-                                  {res.error}
-                                </div>
-                              )}
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div className="text-zinc-700 font-medium italic">Click "Run" to execute your code against test cases.</div>
+                        <div className="text-zinc-700 font-medium italic">Click "Run" to execute your code.</div>
                       )}
                     </div>
                   </div>
@@ -206,27 +200,16 @@ const Workspace = ({ problem }: WorkspaceProps) => {
         </Panel>
       </PanelGroup>
 
-      {/* Editor Footer */}
-      <div className="border-t border-zinc-800 bg-zinc-900 p-3 flex justify-between items-center z-10 shadow-2xl">
-        <button 
-          onClick={() => setShowConsole(!showConsole)}
-          className="flex items-center gap-2 px-4 py-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-all text-xs font-bold uppercase tracking-widest"
-        >
-          <Terminal className="w-4 h-4" />
-          Console
+      <div className="border-t border-zinc-800 bg-zinc-900 p-3 flex justify-between items-center z-10">
+        <button onClick={() => setShowConsole(!showConsole)} className="px-4 py-2 text-zinc-500 hover:text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+          <Terminal className="w-4 h-4" /> Console
         </button>
         <div className="flex gap-3">
-          <button
-            onClick={handleRun}
-            disabled={isRunning}
-            className="flex items-center gap-2 px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl transition-all text-xs font-bold uppercase tracking-widest border border-zinc-700 disabled:opacity-50 active:scale-95"
-          >
-            {isRunning ? <Loader2 className="w-4 h-4 animate-spin text-orange-500" /> : <Play className="w-4 h-4" />}
-            Run
+          <button onClick={handleRun} disabled={isRunning} className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/5 disabled:opacity-50 flex items-center gap-2">
+            {isRunning ? <Loader2 className="w-4 h-4 animate-spin text-orange-500" /> : <Play className="w-4 h-4 text-orange-500 fill-current" />} Run
           </button>
-          <button className="flex items-center gap-2 px-8 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-all text-xs font-bold uppercase tracking-widest shadow-lg shadow-orange-500/20 active:scale-95">
-            <Send className="w-4 h-4" />
-            Submit
+          <button onClick={handleRun} className="px-8 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 flex items-center gap-2">
+            <Send className="w-4 h-4" /> Submit
           </button>
         </div>
       </div>
