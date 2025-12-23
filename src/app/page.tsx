@@ -34,7 +34,7 @@ export default function Home() {
         className="relative z-10 max-w-6xl mx-auto px-8 pt-32 pb-40 flex flex-col items-center"
       >
         <motion.div variants={fadeInUp} className="mb-12">
-          <Logo className="w-20 h-20 filter drop-shadow-[0_0_20px_rgba(249,115,22,0.3)]" />
+          <Logo className="w-20 h-20 filter drop-shadow-[0_0_30px_rgba(249,115,22,0.4)] transition-transform hover:scale-110 duration-500 cursor-pointer" />
         </motion.div>
 
         <motion.div variants={fadeInUp} className="text-center space-y-8 mb-20">
@@ -51,13 +51,13 @@ export default function Home() {
         <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-40">
           <Link
             href="/problems"
-            className="group relative w-full sm:w-auto px-10 py-4 bg-white text-black font-semibold rounded-xl hover:bg-zinc-200 transition-all flex items-center justify-center gap-3 shadow-2xl active:scale-95"
+            className="group relative w-full sm:w-auto px-12 py-4 bg-white text-black font-semibold rounded-xl hover:bg-zinc-200 transition-all flex items-center justify-center gap-3 shadow-2xl active:scale-95"
           >
-            Explore Problems <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            Start Solving <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
             href="/explore"
-            className="w-full sm:w-auto px-10 py-4 glass text-white font-semibold rounded-xl hover:bg-white/5 transition-all text-center border border-white/10 active:scale-95 flex items-center justify-center gap-3"
+            className="w-full sm:w-auto px-12 py-4 glass text-white font-semibold rounded-xl hover:bg-white/5 transition-all text-center border border-white/10 active:scale-95 flex items-center justify-center gap-3"
           >
             <Command className="w-4 h-4" /> Learning Paths
           </Link>
@@ -89,13 +89,13 @@ export default function Home() {
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -5 }}
-              className="p-10 rounded-[40px] bg-zinc-900/40 border border-white/5 hover:border-white/10 transition-all group relative overflow-hidden shadow-sm hover:shadow-xl"
+              className="p-10 rounded-[40px] bg-zinc-900/40 border border-white/5 hover:border-white/10 transition-all group relative overflow-hidden shadow-sm hover:shadow-2xl"
             >
               <div className="mb-8 p-4 bg-white/5 w-fit rounded-2xl border border-white/5 text-zinc-400 group-hover:text-white transition-colors">
                 {feature.icon}
               </div>
               <h3 className="text-lg font-bold text-white mb-4">{feature.title}</h3>
-              <p className="text-zinc-500 text-sm font-medium leading-relaxed">{feature.desc}</p>
+              <p className="text-zinc-500 text-sm font-medium leading-relaxed tracking-tight">{feature.desc}</p>
             </motion.div>
           ))}
         </motion.div>

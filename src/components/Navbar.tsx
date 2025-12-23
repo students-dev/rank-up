@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { 
-  LogOut, User as UserIcon, ChevronDown, Compass, BookOpen, 
-  MessageSquare, Briefcase, Award, Users, Info, GitBranch, Mail, Users2, Settings 
+  ChevronDown, Compass, BookOpen, 
+  MessageSquare, Briefcase, Award, Users, Info, GitBranch, Mail, Users2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Logo } from "./Logo";
+import { UserDropdown } from "./navbar/UserDropdown";
+import { NavbarSearch } from "./navbar/NavbarSearch";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -27,17 +29,17 @@ const Navbar = () => {
     { name: "About", href: "/about", icon: <Info className="w-4 h-4" /> },
     { name: "Credits", href: "/credits", icon: <Users className="w-4 h-4" /> },
     { name: "Contact", href: "/contact", icon: <Mail className="w-4 h-4" /> },
-    { name: "Premium", href: "/premium", icon: <Sparkles className="w-4 h-4" />, color: "text-orange-500" },
+    { name: "Premium", href: "/premium", icon: <SparklesIcon className="w-4 h-4" />, color: "text-orange-500" },
   ];
 
   return (
     <nav className="sticky top-0 z-[100] h-16 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-        <div className="flex justify-between h-full items-center">
-          <div className="flex items-center gap-8">
+        <div className="flex justify-between h-full items-center gap-8">
+          <div className="flex items-center gap-8 shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
               <Logo className="w-7 h-7 group-hover:scale-110 transition-transform duration-300" />
-              <span className="text-xl font-bold tracking-tight text-white group-hover:text-orange-500 transition-colors">
+              <span className="text-xl font-bold tracking-tight text-white group-hover:text-orange-500 transition-colors hidden sm:block">
                 Rankup
               </span>
             </Link>
@@ -72,7 +74,8 @@ const Navbar = () => {
                           <Link
                             key={link.name}
                             href={link.href}
-                            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium hover:bg-white/5 transition-all ${link.color || 'text-zinc-400 hover:text-white'}`}
+                            onClick={() => setIsMoreOpen(false)}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-medium hover:bg-white/5 transition-all ${link.color || 'text-zinc-400 hover:text-white'}`}
                           >
                             <span className="shrink-0">{link.icon}</span>
                             {link.name}
@@ -86,35 +89,17 @@ const Navbar = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            {session ? (
-              <div className="flex items-center gap-4">
-                <Link href="/settings" className="p-2 text-zinc-500 hover:text-white transition-colors">
-                  <Settings className="w-4 h-4" />
-                </Link>
-                <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-white/10 hover:bg-zinc-800 transition-all">
-                  <div className="w-5 h-5 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center overflow-hidden">
-                    {session.user?.image ? (
-                      <img src={session.user.image} alt={session.user.name || "User"} />
-                    ) : (
-                      <UserIcon className="w-3 h-3 text-zinc-400" />
-                    )}
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300">
-                    {session.user?.name?.split(' ')[0]}
-                  </span>
-                </Link>
-                <button
-                  onClick={() => signOut()}
-                  className="p-2 text-zinc-500 hover:text-rose-500 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
+          <div className="flex-1 flex justify-center max-w-xl">
+            <NavbarSearch />
+          </div>
+
+          <div className="flex items-center gap-4 shrink-0">
+            {session?.user ? (
+              <UserDropdown user={session.user} />
             ) : (
               <button
                 onClick={() => signIn()}
-                className="bg-white text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-zinc-200 transition-all"
+                className="bg-white text-black px-5 py-2 rounded-xl text-sm font-semibold hover:bg-zinc-200 transition-all shadow-xl shadow-white/5"
               >
                 Sign In
               </button>
@@ -134,7 +119,7 @@ function HelpCircle(props: any) {
   return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>;
 }
 
-function Sparkles(props: any) {
+function SparklesIcon(props: any) {
   return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>;
 }
 

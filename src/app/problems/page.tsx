@@ -1,119 +1,143 @@
+"use client";
+
 import Link from "next/link";
-import { CheckCircle2, Circle, Trophy } from "lucide-react";
-import { prisma } from "@/lib/prisma";
-import { Problem } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { CheckCircle2, Circle, Trophy, Search, Filter } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const difficultyColor = {
-  EASY: "text-emerald-500",
-  MEDIUM: "text-amber-500",
-  HARD: "text-rose-500",
+  EASY: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+  MEDIUM: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+  HARD: "text-rose-500 bg-rose-500/10 border-rose-500/20",
 };
 
-export default async function ProblemsPage() {
-  const session = await getServerSession(authOptions);
-  
-  const problems = await prisma.problem.findMany({
-    orderBy: { order: "asc" },
-  });
+export default function ProblemsPage() {
+  const [problems, setProblems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [difficulty, setDifficulty] = useState("ALL");
+  const [stats, setStats] = useState({ solved: 0, total: 0 });
 
-  let userSolvedIds: string[] = [];
-  let userRank = "Unranked";
-  let xp = 0;
-
-  if (session?.user?.email) {
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: {
-        submissions: {
-          where: { status: "Accepted" },
-          select: { problemId: true }
-        }
+  useEffect(() => {
+    const fetchProblems = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/problems?search=${search}&difficulty=${difficulty}`);
+        const data = await res.json();
+        setProblems(data);
+        setStats({ solved: 0, total: data.length });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-    });
-    if (user) {
-      userSolvedIds = user.submissions.map((s: any) => s.problemId);
-      xp = user.xp;
-      if (xp > 1000) userRank = "Gold III";
-      else if (xp > 500) userRank = "Silver I";
-      else if (xp > 0) userRank = "Bronze I";
-    }
-  }
+    };
+
+    const timer = setTimeout(fetchProblems, 300);
+    return () => clearTimeout(timer);
+  }, [search, difficulty]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 font-sans bg-zinc-950 min-h-screen">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
-        <div>
-          <h1 className="text-4xl font-bold mb-2 text-white tracking-tight">Problem Set</h1>
-          <p className="text-zinc-500 text-lg font-medium">Choose a challenge and start coding.</p>
+    <div className="max-w-7xl mx-auto px-6 py-12 font-sans bg-zinc-950 min-h-screen">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-8">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold text-white tracking-tight">Problem Set</h1>
+          <p className="text-zinc-500 font-medium">Elevate your technical skills with curated challenges.</p>
         </div>
-        <div className="bg-zinc-900 border border-white/5 p-4 rounded-3xl flex gap-8 w-full md:w-auto shadow-2xl">
-          <div className="text-center flex-1 md:flex-none">
-            <p className="text-zinc-600 text-[10px] uppercase font-black tracking-widest mb-1">Solved</p>
-            <p className="text-2xl font-black text-white">{userSolvedIds.length}/{problems.length}</p>
-          </div>
-          <div className="text-center border-l border-white/5 pl-8 flex-1 md:flex-none">
-            <p className="text-zinc-600 text-[10px] uppercase font-black tracking-widest mb-1">Rank</p>
-            <div className="flex items-center justify-center gap-2 text-orange-500">
-              <Trophy className="w-5 h-5 fill-current" />
-              <p className="text-2xl font-black">{userRank}</p>
+        
+        <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="relative flex-1 md:w-80">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
+                <input 
+                    type="text" 
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search title or category..." 
+                    className="w-full bg-zinc-900 border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:border-orange-500/50 transition-all font-medium text-zinc-300"
+                />
             </div>
-          </div>
+            <select 
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value)}
+                className="bg-zinc-900 border border-white/5 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:border-orange-500/50 transition-all font-bold uppercase tracking-widest text-zinc-500 cursor-pointer"
+            >
+                <option value="ALL">All Levels</option>
+                <option value="EASY">Easy</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HARD">Hard</option>
+            </select>
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-zinc-900/40 border border-white/5 rounded-[32px] shadow-2xl">
-        <table className="w-full text-left border-collapse min-w-[600px]">
-          <thead>
-            <tr className="border-b border-white/5 bg-white/[0.02]">
-              <th className="px-8 py-5 font-black text-[10px] uppercase tracking-widest text-zinc-500 w-24">Status</th>
-              <th className="px-8 py-5 font-black text-[10px] uppercase tracking-widest text-zinc-500">Title</th>
-              <th className="px-8 py-5 font-black text-[10px] uppercase tracking-widest text-zinc-500 w-32">Difficulty</th>
-              <th className="px-8 py-5 font-black text-[10px] uppercase tracking-widest text-zinc-500 w-40">Category</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {problems.length > 0 ? (
-              problems.map((problem: Problem) => (
-                <tr
-                  key={problem.id}
-                  className="hover:bg-white/[0.02] transition-all group cursor-pointer"
-                >
-                  <td className="px-8 py-5">
-                    {userSolvedIds.includes(problem.id) ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                    ) : (
-                      <Circle className="w-5 h-5 text-zinc-800" />
-                    )}
-                  </td>
-                  <td className="px-8 py-5">
-                    <Link
-                      href={`/problems/${problem.slug}`}
-                      className="font-bold text-zinc-100 group-hover:text-orange-500 transition-colors tracking-tight"
-                    >
-                      {problem.order}. {problem.title}
-                    </Link>
-                  </td>
-                  <td className={`px-8 py-5 font-black text-[10px] tracking-widest ${difficultyColor[problem.difficulty as keyof typeof difficultyColor]}`}>
-                    {problem.difficulty}
-                  </td>
-                  <td className="px-8 py-5">
-                    <span className="bg-zinc-800/50 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border border-white/5 text-zinc-500 group-hover:text-zinc-300 transition-colors">
-                      {problem.category}
-                    </span>
-                  </td>
+      <div className="overflow-hidden bg-zinc-900/40 border border-white/5 rounded-[32px] shadow-2xl">
+        <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[800px]">
+            <thead>
+                <tr className="border-b border-white/5 bg-white/[0.02]">
+                <th className="px-8 py-5 font-black text-[10px] uppercase tracking-[0.2em] text-zinc-600 w-24 text-center">Status</th>
+                <th className="px-8 py-5 font-black text-[10px] uppercase tracking-[0.2em] text-zinc-600">Problem</th>
+                <th className="px-8 py-5 font-black text-[10px] uppercase tracking-[0.2em] text-zinc-600 w-32">Difficulty</th>
+                <th className="px-8 py-5 font-black text-[10px] uppercase tracking-[0.2em] text-zinc-600 w-40">Category</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={4} className="px-8 py-24 text-center text-zinc-600 font-medium italic">
-                  No problems found. Database is empty.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+                <AnimatePresence mode="wait">
+                {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                        <tr key={i} className="animate-pulse">
+                            <td className="px-8 py-6"><div className="w-5 h-5 bg-zinc-800 rounded-full mx-auto" /></td>
+                            <td className="px-8 py-6"><div className="h-4 bg-zinc-800 rounded-lg w-48" /></td>
+                            <td className="px-8 py-6"><div className="h-4 bg-zinc-800 rounded-lg w-16" /></td>
+                            <td className="px-8 py-6"><div className="h-4 bg-zinc-800 rounded-lg w-24" /></td>
+                        </tr>
+                    ))
+                ) : problems.length > 0 ? (
+                problems.map((problem: any) => (
+                    <motion.tr
+                        layout
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        key={problem.id}
+                        className="hover:bg-white/[0.02] transition-all group"
+                    >
+                    <td className="px-8 py-6 text-center">
+                        <Circle className="w-5 h-5 text-zinc-800 mx-auto group-hover:text-zinc-700 transition-colors" />
+                    </td>
+                    <td className="px-8 py-6">
+                        <Link
+                        href={`/problems/${problem.slug}`}
+                        className="font-bold text-zinc-100 group-hover:text-orange-500 transition-colors tracking-tight text-base"
+                        >
+                        {problem.order}. {problem.title}
+                        </Link>
+                    </td>
+                    <td className="px-8 py-6">
+                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${difficultyColor[problem.difficulty as keyof typeof difficultyColor]}`}>
+                        {problem.difficulty}
+                        </span>
+                    </td>
+                    <td className="px-8 py-6">
+                        <span className="text-zinc-500 font-bold text-xs uppercase tracking-tight group-hover:text-zinc-300 transition-colors">
+                        {problem.category}
+                        </span>
+                    </td>
+                    </motion.tr>
+                ))
+                ) : (
+                <tr>
+                    <td colSpan={4} className="px-8 py-24 text-center">
+                        <div className="flex flex-col items-center gap-4 opacity-40">
+                            <Search className="w-8 h-8 text-zinc-600" />
+                            <p className="text-zinc-600 font-bold uppercase text-[10px] tracking-[0.2em]">No matching problems found</p>
+                        </div>
+                    </td>
+                </tr>
+                )}
+                </AnimatePresence>
+            </tbody>
+            </table>
+        </div>
       </div>
     </div>
   );
