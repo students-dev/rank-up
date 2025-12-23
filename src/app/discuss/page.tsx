@@ -55,46 +55,48 @@ export default function DiscussPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="p-10 rounded-[40px] bg-zinc-900/40 border border-white/5 hover:border-white/10 transition-all group cursor-pointer shadow-sm hover:shadow-2xl"
+                  className="p-10 rounded-[40px] bg-zinc-900/40 border border-white/5 hover:border-white/10 transition-all group shadow-sm hover:shadow-2xl"
                 >
-                  <div className="flex flex-col md:flex-row justify-between gap-8">
-                    <div className="space-y-6 flex-1">
-                      <div className="flex flex-wrap gap-2">
-                        {post.tags.map((tag: string, j: number) => (
-                          <span key={j} className="text-[9px] font-black uppercase tracking-widest text-zinc-500 border border-white/5 px-2.5 py-1 rounded-lg bg-white/[0.02]">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <h3 className="text-2xl font-bold text-white group-hover:text-orange-500 transition-colors leading-tight tracking-tight">{post.title}</h3>
-                      <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-zinc-600">
-                        <div className="flex items-center gap-2">
-                            <div className="w-5 h-5 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center overflow-hidden">
-                                {post.author.image ? <img src={post.author.image} alt="" /> : <User className="w-3 h-3" />}
+                  <Link href={`/discuss/${post.id}`}>
+                    <div className="flex flex-col md:flex-row justify-between gap-8">
+                        <div className="space-y-6 flex-1">
+                        <div className="flex flex-wrap gap-2">
+                            {post.tags.map((tag: string, j: number) => (
+                            <span key={j} className="text-[9px] font-black uppercase tracking-widest text-zinc-500 border border-white/5 px-2.5 py-1 rounded-lg bg-white/[0.02]">
+                                {tag}
+                            </span>
+                            ))}
+                        </div>
+                        <h3 className="text-2xl font-bold text-white group-hover:text-orange-500 transition-colors leading-tight tracking-tight">{post.title}</h3>
+                        <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-zinc-600">
+                            <div className="flex items-center gap-2">
+                                <div className="w-5 h-5 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center overflow-hidden">
+                                    {post.author.image ? <img src={post.author.image} alt="" /> : <User className="w-3 h-3" />}
+                                </div>
+                                <span className="text-zinc-400">{post.author.name}</span>
                             </div>
-                            <span className="text-zinc-400">{post.author.name}</span>
+                            <div className="flex items-center gap-2">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-orange-500/50">
+                                <MessageSquare className="w-3.5 h-3.5" />
+                                <span>{post._count.comments} Comments</span>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Clock className="w-3.5 h-3.5" />
-                            <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-orange-500/50">
-                            <MessageSquare className="w-3.5 h-3.5" />
-                            <span>{post._count.comments} Comments</span>
+                        <div className="flex md:flex-col justify-end items-end gap-8 md:gap-4 shrink-0">
+                        <div className="flex flex-col items-center">
+                            <span className="text-2xl font-black text-white leading-none">{post.likes}</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600">Votes</span>
                         </div>
-                      </div>
+                        <div className="flex flex-col items-center">
+                            <span className="text-2xl font-black text-white leading-none">{post.views}</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600">Views</span>
+                        </div>
+                        </div>
                     </div>
-                    <div className="flex md:flex-col justify-end items-end gap-8 md:gap-4 shrink-0">
-                       <div className="flex flex-col items-center">
-                          <span className="text-2xl font-black text-white leading-none">{post.likes}</span>
-                          <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600">Votes</span>
-                       </div>
-                       <div className="flex flex-col items-center">
-                          <span className="text-2xl font-black text-white leading-none">{post.views}</span>
-                          <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600">Views</span>
-                       </div>
-                    </div>
-                  </div>
+                  </Link>
                 </motion.div>
               ))
           ) : (
