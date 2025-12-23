@@ -8,32 +8,44 @@ export const Logo = ({ className = "w-8 h-8" }: { className?: string }) => {
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      {/* Outer Hexagon / Nut Shape */}
+      <defs>
+        <linearGradient id="rankup-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f97316" />
+          <stop offset="100%" stopColor="#ea580c" />
+        </linearGradient>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
+      
+      {/* Background Shield Shape */}
       <path
-        d="M50 5L93.3 30V80L50 105L6.7 80V30L50 5Z"
-        stroke="currentColor"
+        d="M50 10L85 25V55C85 75 50 90 50 90C50 90 15 75 15 55V25L50 10Z"
+        fill="#18181b"
+        stroke="white"
+        strokeOpacity="0.1"
         strokeWidth="2"
-        className="text-zinc-800"
       />
       
-      {/* Stylized R + Up Arrow */}
+      {/* Stylized 'R' with built-in Upward Arrow */}
       <path
-        d="M35 70V30H55C62 30 65 35 65 40C65 45 62 50 55 50H35M50 50L65 70"
-        stroke="currentColor"
+        d="M38 65V35H55C62 35 65 40 65 45C65 50 62 55 55 55H38M52 55L65 70"
+        stroke="url(#rankup-gradient)"
         strokeWidth="8"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-white"
+        filter="url(#glow)"
       />
       
-      {/* Upward Glow Accent */}
+      {/* Minimalist Top Accent */}
       <path
-        d="M50 15L60 25M50 15L40 25"
-        stroke="#f97316"
-        strokeWidth="6"
+        d="M45 22L50 17L55 22"
+        stroke="white"
+        strokeWidth="4"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="animate-pulse"
+        strokeOpacity="0.8"
       />
     </svg>
   );
