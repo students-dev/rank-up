@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CheckCircle2, Circle, Trophy } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { Problem } from "@prisma/client";
 
 const difficultyColor = {
   EASY: "text-emerald-500",
@@ -47,7 +48,7 @@ export default async function ProblemsPage() {
           </thead>
           <tbody className="divide-y divide-zinc-800/50">
             {problems.length > 0 ? (
-              problems.map((problem) => (
+              problems.map((problem: Problem) => (
                 <tr
                   key={problem.id}
                   className="hover:bg-zinc-800/30 transition-colors group"

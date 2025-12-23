@@ -1,6 +1,10 @@
 import { PrismaClient, Difficulty } from "@prisma/client";
+import { withAccelerate } from "@prisma/extension-accelerate";
 
-const prisma = new PrismaClient();
+// @ts-ignore
+const prisma = new PrismaClient({
+  accelerateUrl: process.env.DATABASE_URL,
+}).$extends(withAccelerate());
 
 async function main() {
   const problems = [
@@ -10,18 +14,7 @@ async function main() {
       difficulty: Difficulty.EASY,
       category: "Array",
       order: 1,
-      description: `
-Given an array of integers `nums` and an integer `target`, return *indices of the two numbers such that they add up to `target`*.
-
-You may assume that each input would have ***exactly* one solution**, and you may not use the *same* element twice.
-
-You can return the answer in any order.
-
-### Example 1:
-**Input:** nums = [2,7,11,15], target = 9
-**Output:** [0,1]
-**Explanation:** Because nums[0] + nums[1] == 9, we return [0, 1].
-      `,
+      description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
       starterCode: `function twoSum(nums, target) {
   // Write your code here
 };`,
@@ -37,15 +30,7 @@ You can return the answer in any order.
       difficulty: Difficulty.MEDIUM,
       category: "Math",
       order: 2,
-      description: `
-Given a signed 32-bit integer `x`, return `x` with its digits reversed. If reversing `x` causes the value to go outside the signed 32-bit integer range [-2^31, 2^31 - 1], then return 0.
-
-**Assume the environment does not allow you to store 64-bit integers (signed or unsigned).**
-
-### Example 1:
-**Input:** x = 123
-**Output:** 321
-      `,
+      description: "Given a signed 32-bit integer x, return x with its digits reversed.",
       starterCode: `function reverse(x) {
   // Write your code here
 };`,
@@ -61,7 +46,16 @@ Given a signed 32-bit integer `x`, return `x` with its digits reversed. If rever
     await prisma.problem.upsert({
       where: { slug: problem.slug },
       update: {},
-      create: problem,
+      create: {
+        title: problem.title,
+        slug: problem.slug,
+        difficulty: problem.difficulty,
+        category: problem.category,
+        order: problem.order,
+        description: problem.description,
+        starterCode: problem.starterCode,
+        testCases: problem.testCases as any,
+      },
     });
   }
 
@@ -74,5 +68,6 @@ main()
     process.exit(1);
   })
   .finally(async () => {
+    // @ts-ignore
     await prisma.$disconnect();
   });

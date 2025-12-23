@@ -45,7 +45,7 @@ const Workspace = ({ problem }: WorkspaceProps) => {
   };
 
   return (
-    <div className="h-[calc(100vh-64px)] overflow-hidden bg-zinc-950 flex flex-col">
+    <div className="h-[calc(100vh-64px)] overflow-hidden bg-zinc-950 flex flex-col font-sans">
       <PanelGroup direction="horizontal">
         {/* Left Panel: Problem Description */}
         <Panel defaultSize={40} minSize={25}>
@@ -88,9 +88,9 @@ const Workspace = ({ problem }: WorkspaceProps) => {
               <div className="h-full flex flex-col">
                 <div className="flex justify-between items-center px-4 py-2 border-b border-zinc-800 bg-zinc-900">
                   <div className="flex items-center gap-2 text-sm text-zinc-400">
-                    <span className="bg-zinc-800 px-2 py-1 rounded border border-zinc-700 font-mono">index.js</span>
+                    <span className="bg-zinc-800 px-2 py-1 rounded border border-zinc-700 font-mono text-[10px]">index.js</span>
                     <span className="text-zinc-600">/</span>
-                    <span className="text-zinc-500">JavaScript</span>
+                    <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">JavaScript</span>
                   </div>
                   <Settings className="w-4 h-4 text-zinc-500 cursor-pointer hover:text-zinc-300" />
                 </div>
@@ -126,13 +126,13 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                 <Panel defaultSize={30} minSize={10}>
                   <div className="h-full bg-zinc-900 border-t border-zinc-800 flex flex-col">
                     <div className="flex justify-between items-center px-4 py-2 border-b border-zinc-800 bg-zinc-900/50">
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-500">
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                         <Terminal className="w-3.5 h-3.5" />
                         Console Output
                       </div>
                       <button 
                         onClick={() => setShowConsole(false)}
-                        className="text-zinc-500 hover:text-zinc-300 text-xs"
+                        className="text-zinc-500 hover:text-zinc-300 text-xs font-bold"
                       >
                         Hide
                       </button>
@@ -140,54 +140,54 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                     <div className="flex-1 overflow-y-auto p-4 font-mono text-sm">
                       {isRunning ? (
                         <div className="flex items-center gap-2 text-zinc-400">
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin text-orange-500" />
                           Running test cases...
                         </div>
                       ) : results ? (
                         <div className="space-y-4">
                           <div className="flex items-center gap-2">
                             {results.allPassed ? (
-                              <span className="text-emerald-500 flex items-center gap-1.5 font-bold">
+                              <span className="text-emerald-500 flex items-center gap-1.5 font-black uppercase text-xs tracking-widest">
                                 <CheckCircle2 className="w-4 h-4" /> All Test Cases Passed!
                               </span>
                             ) : (
-                              <span className="text-rose-500 flex items-center gap-1.5 font-bold">
+                              <span className="text-rose-500 flex items-center gap-1.5 font-black uppercase text-xs tracking-widest">
                                 <XCircle className="w-4 h-4" /> Some Test Cases Failed
                               </span>
                             )}
                           </div>
                           {results.results.map((res: any, i: number) => (
-                            <div key={i} className={`p-3 rounded-lg border ${res.passed ? "bg-emerald-500/5 border-emerald-500/20" : "bg-rose-500/5 border-rose-500/20"}`}>
-                              <div className="flex justify-between mb-2">
-                                <span className={`text-xs font-bold uppercase ${res.passed ? "text-emerald-500" : "text-rose-500"}`}>
+                            <div key={i} className={`p-4 rounded-xl border ${res.passed ? "bg-emerald-500/5 border-emerald-500/10" : "bg-rose-500/5 border-rose-500/10"}`}>
+                              <div className="flex justify-between mb-3">
+                                <span className={`text-[10px] font-black uppercase tracking-widest ${res.passed ? "text-emerald-500" : "text-rose-500"}`}>
                                   Case {i + 1}: {res.passed ? "Passed" : "Failed"}
                                 </span>
-                                {res.runtime && <span className="text-zinc-500 text-xs">{res.runtime}ms</span>}
+                                {res.runtime && <span className="text-zinc-600 text-[10px] font-bold">{res.runtime}ms</span>}
                               </div>
                               <div className="grid grid-cols-2 gap-4 text-xs">
                                 <div>
-                                  <p className="text-zinc-500 mb-1">Input:</p>
-                                  <pre className="bg-black/30 p-2 rounded text-zinc-300 overflow-x-auto">
+                                  <p className="text-zinc-600 font-bold uppercase text-[9px] tracking-widest mb-1.5">Input</p>
+                                  <pre className="bg-black/40 p-2.5 rounded-lg text-zinc-400 overflow-x-auto border border-zinc-800/50">
                                     {JSON.stringify(res.input)}
                                   </pre>
                                 </div>
                                 <div>
-                                  <p className="text-zinc-500 mb-1">Expected:</p>
-                                  <pre className="bg-black/30 p-2 rounded text-zinc-300 overflow-x-auto">
+                                  <p className="text-zinc-600 font-bold uppercase text-[9px] tracking-widest mb-1.5">Expected</p>
+                                  <pre className="bg-black/40 p-2.5 rounded-lg text-zinc-400 overflow-x-auto border border-zinc-800/50">
                                     {JSON.stringify(res.expected)}
                                   </pre>
                                 </div>
                               </div>
                               {!res.passed && res.actual !== undefined && (
-                                <div className="mt-2">
-                                  <p className="text-zinc-500 mb-1 text-xs">Actual:</p>
-                                  <pre className="bg-rose-500/10 p-2 rounded text-rose-200 overflow-x-auto text-xs">
+                                <div className="mt-3">
+                                  <p className="text-rose-500/50 font-bold uppercase text-[9px] tracking-widest mb-1.5">Actual Output</p>
+                                  <pre className="bg-rose-500/10 p-2.5 rounded-lg text-rose-200 overflow-x-auto text-xs border border-rose-500/20">
                                     {JSON.stringify(res.actual)}
                                   </pre>
                                 </div>
                               )}
                               {res.error && (
-                                <div className="mt-2 p-2 bg-rose-500/10 rounded border border-rose-500/20 text-rose-400 text-xs">
+                                <div className="mt-3 p-3 bg-rose-500/10 rounded-lg border border-rose-500/20 text-rose-400 text-xs font-medium">
                                   {res.error}
                                 </div>
                               )}
@@ -195,7 +195,7 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                           ))}
                         </div>
                       ) : (
-                        <div className="text-zinc-600">Click "Run" to execute your code against test cases.</div>
+                        <div className="text-zinc-700 font-medium italic">Click "Run" to execute your code against test cases.</div>
                       )}
                     </div>
                   </div>
@@ -207,24 +207,24 @@ const Workspace = ({ problem }: WorkspaceProps) => {
       </PanelGroup>
 
       {/* Editor Footer */}
-      <div className="border-t border-zinc-800 bg-zinc-900 p-3 flex justify-between items-center z-10">
+      <div className="border-t border-zinc-800 bg-zinc-900 p-3 flex justify-between items-center z-10 shadow-2xl">
         <button 
           onClick={() => setShowConsole(!showConsole)}
-          className="flex items-center gap-2 px-3 py-1.5 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded-lg transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-4 py-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-all text-xs font-bold uppercase tracking-widest"
         >
           <Terminal className="w-4 h-4" />
           Console
         </button>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <button
             onClick={handleRun}
             disabled={isRunning}
-            className="flex items-center gap-2 px-4 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors text-sm font-medium border border-zinc-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl transition-all text-xs font-bold uppercase tracking-widest border border-zinc-700 disabled:opacity-50 active:scale-95"
           >
-            {isRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+            {isRunning ? <Loader2 className="w-4 h-4 animate-spin text-orange-500" /> : <Play className="w-4 h-4" />}
             Run
           </button>
-          <button className="flex items-center gap-2 px-4 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-medium">
+          <button className="flex items-center gap-2 px-8 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-all text-xs font-bold uppercase tracking-widest shadow-lg shadow-orange-500/20 active:scale-95">
             <Send className="w-4 h-4" />
             Submit
           </button>
