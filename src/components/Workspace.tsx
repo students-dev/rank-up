@@ -6,6 +6,7 @@ import Editor from "@monaco-editor/react";
 import ReactMarkdown from "react-markdown";
 import { Play, Send, Settings, Terminal, CheckCircle2, XCircle, Loader2, ChevronDown, History, Sparkles, Lightbulb, Palette } from "lucide-react";
 import confetti from "canvas-confetti";
+import { motion } from "framer-motion";
 import { SubmissionModal } from "@/components/SubmissionModal";
 
 interface WorkspaceProps {
@@ -79,7 +80,7 @@ const Workspace = ({ problem }: WorkspaceProps) => {
   };
 
   return (
-    <div className="h-[calc(100vh-64px)] overflow-hidden bg-zinc-950 flex flex-col font-sans">
+    <div className="h-[calc(100vh-64px)] overflow-hidden bg-zinc-950 flex flex-col font-sans text-zinc-200">
       <SubmissionModal 
         isOpen={showModal} 
         onClose={() => setShowModal(false)}
@@ -114,15 +115,14 @@ const Workspace = ({ problem }: WorkspaceProps) => {
               </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-10 prose prose-invert max-w-none">
+            <div className="flex-1 overflow-y-auto p-10 prose prose-invert max-w-none prose-p:text-zinc-400 prose-headings:text-white prose-strong:text-zinc-200">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-3xl font-black text-white tracking-tighter m-0">{problem.title}</h2>
                 <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[9px] font-black uppercase tracking-widest">Easy</span>
               </div>
               <ReactMarkdown>{problem.description}</ReactMarkdown>
 
-              {/* AI Hint System */}
-              <div className="mt-12 space-y-4 pt-12 border-t border-white/5">
+              <div className="mt-12 space-y-4 pt-12 border-t border-white/5 font-sans">
                 <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                     <Sparkles className="w-3.5 h-3.5 text-orange-500" />
                     Rank-up Assistant
@@ -131,7 +131,7 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                     <motion.div 
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="p-6 rounded-[24px] bg-orange-500/5 border border-orange-500/10 text-zinc-300 text-sm font-medium leading-relaxed"
+                        className="p-6 rounded-[24px] bg-orange-500/5 border border-orange-500/10 text-zinc-300 text-sm font-medium leading-relaxed shadow-inner"
                     >
                         {hints[hintIndex]}
                     </motion.div>
@@ -258,11 +258,11 @@ const Workspace = ({ problem }: WorkspaceProps) => {
                                 <div className="grid grid-cols-2 gap-6 text-xs font-bold font-mono">
                                     <div className="space-y-2">
                                         <p className="text-[9px] uppercase text-zinc-600 tracking-widest">Input</p>
-                                        <pre className="bg-black/40 p-3 rounded-xl text-zinc-400 border border-white/5">{JSON.stringify(res.input)}</pre>
+                                        <pre className="bg-black/40 p-3 rounded-xl text-zinc-400 border border-white/5 overflow-x-auto">{JSON.stringify(res.input)}</pre>
                                     </div>
                                     <div className="space-y-2">
                                         <p className="text-[9px] uppercase text-zinc-600 tracking-widest">Expected</p>
-                                        <pre className="bg-black/40 p-3 rounded-xl text-zinc-400 border border-white/5">{JSON.stringify(res.expected)}</pre>
+                                        <pre className="bg-black/40 p-3 rounded-xl text-zinc-400 border border-white/5 overflow-x-auto">{JSON.stringify(res.expected)}</pre>
                                     </div>
                                 </div>
                               )}
@@ -284,21 +284,21 @@ const Workspace = ({ problem }: WorkspaceProps) => {
 
       <div className="border-t border-zinc-800 bg-zinc-900 p-4 px-6 flex justify-between items-center z-10 shadow-2xl relative">
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-        <button onClick={() => setShowConsole(!showConsole)} className="px-4 py-2 text-zinc-500 hover:text-white text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-2 transition-all group">
+        <button onClick={() => setShowConsole(!showConsole)} className="px-4 py-2 text-zinc-500 hover:text-white text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-2 transition-all group font-sans">
           <Terminal className="w-4 h-4 group-hover:text-orange-500 transition-colors" /> Console
         </button>
         <div className="flex gap-4">
           <button 
             onClick={() => handleExecute(false)} 
             disabled={isRunning} 
-            className="px-8 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-[14px] text-[10px] font-black uppercase tracking-[0.2em] border border-white/5 disabled:opacity-50 flex items-center gap-2 transition-all active:scale-95 shadow-xl"
+            className="px-8 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-[14px] text-[10px] font-black uppercase tracking-[0.2em] border border-white/5 disabled:opacity-50 flex items-center gap-2 transition-all active:scale-95 shadow-xl font-sans"
           >
             {isRunning ? <Loader2 className="w-4 h-4 animate-spin text-orange-500" /> : <Play className="w-4 h-4 text-orange-500 fill-current" />} Run
           </button>
           <button 
             onClick={() => handleExecute(true)} 
             disabled={isRunning}
-            className="px-10 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-[14px] text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-orange-500/20 flex items-center gap-2 transition-all active:scale-95"
+            className="px-10 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-[14px] text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-orange-500/20 flex items-center gap-2 transition-all active:scale-95 font-sans"
           >
             <Send className="w-4 h-4" /> Submit
           </button>

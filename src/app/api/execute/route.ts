@@ -10,7 +10,7 @@ const toCamelCase = (str: string) => {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    const { code, language, problemSlug } = await req.json();
+    const { code, language, problemSlug, isSubmit } = await req.json();
 
     const problem = await prisma.problem.findUnique({
       where: { slug: problemSlug },
@@ -28,11 +28,10 @@ export async function POST(req: Request) {
       const functionName = toCamelCase(problemSlug);
       for (const testCase of testCases) {
         try {
-          // Robust function execution
           const fn = new Function(`
             ${code}
             if (typeof ${functionName} !== 'function') {
-                throw new Error("Function ${functionName} is not defined. Please check your code.");
+                throw new Error("Function ${functionName} is not defined.");
             }
             return ${functionName}(...arguments);
           `);
@@ -61,14 +60,23 @@ export async function POST(req: Request) {
       results.push({ passed: true, message: `Simulated ${language} execution` });
     }
 
+    // Save Submission and Update Stats
     if (session?.user?.email) {
       const user = await prisma.user.findUnique({
         where: { email: session.user.email },
+        include: {
+            submissions: {
+                where: { problemId: problem.id, status: "Accepted" },
+                take: 1
+            }
+        }
       });
 
       if (user) {
-        if (allPassed) {
-          const xpGain = problem.difficulty === "EASY" ? 50 : problem.difficulty === "MEDIUM" ? 100 : 200;
+        const isFirstTimeSolved = user.submissions.length === 0;
+        
+        if (allPassed && isSubmit) {
+          const xpGain = isFirstTimeSolved ? (problem.difficulty === "EASY" ? 50 : problem.difficulty === "MEDIUM" ? 100 : 200) : 0;
           const now = new Date();
           const lastSolvedDate = user.lastSolved ? new Date(user.lastSolved).toDateString() : null;
           const todayDate = now.toDateString();
@@ -103,7 +111,7 @@ export async function POST(req: Request) {
               },
             },
           });
-        } else {
+        } else if (isSubmit) {
           await prisma.submission.create({
             data: {
               userId: user.id,

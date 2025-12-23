@@ -7,8 +7,11 @@ import { ArrowRight, Code2, Rocket, Trophy, Zap, Terminal, Globe, Shield, Sparkl
 export default function Home() {
   const fadeInUp: Variants = {
     initial: { opacity: 0, y: 10 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+    animate: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+    }
   };
 
   const stagger: Variants = {
@@ -21,7 +24,6 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen bg-zinc-950 grid-pattern font-sans overflow-hidden">
-      {/* Dynamic Background Elements */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[800px] bg-orange-500/[0.03] blur-[140px] rounded-full pointer-events-none" />
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/[0.03] blur-[100px] rounded-full pointer-events-none" />
 
@@ -66,7 +68,6 @@ export default function Home() {
           </Link>
         </motion.div>
 
-        {/* High-Fidelity Stats Preview */}
         <motion.div 
           variants={stagger}
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
@@ -107,7 +108,6 @@ export default function Home() {
         </motion.div>
       </motion.div>
 
-      {/* Footer Branding */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

@@ -1,9 +1,22 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GitBranch, Rocket, Sparkles } from "lucide-react";
+import { GitBranch, Rocket, Sparkles, Bug } from "lucide-react";
 
 const changes = [
+  {
+    version: "1.2.1",
+    date: "Dec 23, 2025",
+    type: "Hotfix",
+    title: "The Integrity Update",
+    items: [
+      "Fixed major bug where solving problems multiple times double-counted XP",
+      "Special thanks to Anjali (insta: anjaili0410_) for the detailed bug report",
+      "Optimized database queries for the Leaderboard",
+      "Improved Monaco Editor responsiveness"
+    ],
+    icon: <Bug className="w-4 h-4 text-rose-500" />
+  },
   {
     version: "1.2.0",
     date: "Dec 23, 2025",
@@ -13,7 +26,7 @@ const changes = [
       "New premium design language inspired by Lovable",
       "Enhanced glassmorphism effects across all components",
       "Staggered entrance animations with Framer Motion",
-      "Improved mobile responsiveness for the dashboard"
+      "Skill Radar charts and AI Hint system integration"
     ],
     icon: <Sparkles className="w-4 h-4 text-orange-500" />
   },
@@ -28,18 +41,6 @@ const changes = [
       "Markdown support for problem descriptions"
     ],
     icon: <Rocket className="w-4 h-4 text-blue-500" />
-  },
-  {
-    version: "1.0.0",
-    date: "Dec 18, 2025",
-    type: "Launch",
-    title: "Initial Release",
-    items: [
-      "GitHub & Google OAuth authentication",
-      "Prisma database setup for problem tracking",
-      "Core platform architecture"
-    ],
-    icon: <GitBranch className="w-4 h-4 text-emerald-500" />
   }
 ];
 
@@ -66,7 +67,7 @@ export default function ChangelogPage() {
               </div>
               <div className="space-y-4">
                 <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest">
-                  <span className="text-orange-500">v{change.version}</span>
+                  <span className={change.type === "Hotfix" ? "text-rose-500" : "text-orange-500"}>v{change.version}</span>
                   <span className="text-zinc-600">•</span>
                   <span className="text-zinc-500">{change.date}</span>
                 </div>
