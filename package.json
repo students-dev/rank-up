@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -15,6 +16,7 @@
     "@auth/prisma-adapter": "^2.11.1",
     "@monaco-editor/react": "^4.7.0",
     "@prisma/client": "^7.2.0",
+    "@prisma/extension-accelerate": "^3.0.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.562.0",
