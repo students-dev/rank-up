@@ -2,16 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: 0 0% 2%;
-  --foreground: 0 0% 98%;
-  --primary: 24.6 95% 53.1%;
-  --primary-glow: rgba(249, 115, 22, 0.15);
-}
-
 @layer base {
+  :root {
+    --background: 0 0% 2%;
+    --foreground: 0 0% 98%;
+    --primary: 24.6 95% 53.1%;
+  }
+
   body {
-    @apply bg-zinc-950 text-zinc-50 antialiased selection:bg-orange-500/30;
+    background-color: rgb(9, 9, 11);
+    color: rgb(250, 250, 250);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -21,20 +23,14 @@
   }
   
   .glass {
-    @apply bg-zinc-900/40 backdrop-blur-xl border border-white/5;
+    background-color: rgba(24, 24, 27, 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .grid-background {
     background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
     background-size: 40px 40px;
-  }
-
-  .radial-spotlight {
-    background: radial-gradient(
-      600px circle at var(--x) var(--y),
-      rgba(249, 115, 22, 0.1),
-      transparent 40%
-    );
   }
 }
 
@@ -45,9 +41,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-zinc-800 rounded-full hover:bg-zinc-700 transition-colors;
+  background: rgb(39, 39, 42);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(63, 63, 70);
 }
