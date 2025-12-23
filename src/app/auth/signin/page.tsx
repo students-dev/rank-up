@@ -1,32 +1,49 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { Code2, Github } from "lucide-react";
+import { Code2, Github, MessageSquare } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function SignIn() {
   return (
-    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center p-4">
-      <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
-        <div className="flex flex-col items-center text-center mb-10">
-          <div className="bg-orange-500 p-3 rounded-2xl mb-4">
-            <Code2 className="w-10 h-10 text-white" />
+    <div className="relative min-h-[calc(100vh-64px)] flex items-center justify-center p-4 bg-zinc-950 grid-pattern">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/5 blur-[120px] rounded-full pointer-events-none" />
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md bg-zinc-900 border border-white/5 rounded-[48px] p-10 shadow-2xl relative z-10 overflow-hidden"
+      >
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent" />
+        
+        <div className="flex flex-col items-center text-center mb-12">
+          <div className="bg-white p-3 rounded-2xl mb-6 shadow-xl">
+            <Code2 className="w-8 h-8 text-black" />
           </div>
-          <h1 className="text-3xl font-bold">Welcome to Rank-up</h1>
-          <p className="text-zinc-400 mt-2">Sign in to track your progress and climb the ranks</p>
+          <h1 className="text-3xl font-black text-white tracking-tight">Access Rank-up</h1>
+          <p className="text-zinc-500 mt-2 font-medium">Continue your engineering journey.</p>
         </div>
 
         <div className="space-y-4">
           <button
             onClick={() => signIn("github", { callbackUrl: "/" })}
-            className="w-full flex items-center justify-center gap-3 bg-zinc-800 hover:bg-zinc-700 text-white py-3 px-4 rounded-xl font-semibold transition-all border border-zinc-700"
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-zinc-200 text-black py-4 px-4 rounded-[20px] font-black text-[11px] uppercase tracking-widest transition-all active:scale-[0.98] shadow-lg shadow-white/5"
           >
             <Github className="w-5 h-5" />
             Continue with GitHub
           </button>
+
+          <button
+            onClick={() => signIn("discord", { callbackUrl: "/" })}
+            className="w-full flex items-center justify-center gap-3 bg-[#5865F2] hover:bg-[#4752C4] text-white py-4 px-4 rounded-[20px] font-black text-[11px] uppercase tracking-widest transition-all active:scale-[0.98] shadow-lg shadow-[#5865F2]/20"
+          >
+            <MessageSquare className="w-5 h-5 fill-current" />
+            Continue with Discord
+          </button>
           
           <button
             onClick={() => signIn("google", { callbackUrl: "/" })}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-zinc-100 text-black py-3 px-4 rounded-xl font-semibold transition-all"
+            className="w-full flex items-center justify-center gap-3 bg-zinc-800 hover:bg-zinc-700 text-white py-4 px-4 rounded-[20px] font-black text-[11px] uppercase tracking-widest transition-all active:scale-[0.98] border border-white/5"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -50,10 +67,10 @@ export default function SignIn() {
           </button>
         </div>
 
-        <p className="mt-8 text-center text-xs text-zinc-500">
-          By signing in, you agree to our Terms of Service and Privacy Policy.
+        <p className="mt-10 text-center text-[10px] font-black uppercase tracking-widest text-zinc-600">
+          Rank-up Cloud Engineering • v1.2
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 }

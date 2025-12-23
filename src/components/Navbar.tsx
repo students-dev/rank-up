@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Code2, LogOut, User as UserIcon, LayoutGrid, Trophy as TrophyIcon, Sparkles, HelpCircle, Settings, ChevronDown, Rocket, Compass, BookOpen, MessageSquare, Briefcase, Award } from "lucide-react";
+import { Code2, LogOut, User as UserIcon, LayoutGrid, Trophy as TrophyIcon, Sparkles, HelpCircle, Settings, ChevronDown, Rocket, Compass, BookOpen, MessageSquare, Briefcase, Award, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
@@ -17,6 +17,7 @@ const Navbar = () => {
     { name: "Roadmap", href: "/roadmap", icon: <BookOpen className="w-4 h-4" /> },
     { name: "Interview Prep", href: "/interview-prep", icon: <Briefcase className="w-4 h-4" /> },
     { name: "Badges", href: "/badges", icon: <Award className="w-4 h-4" /> },
+    { name: "Credits", href: "/credits", icon: <Users className="w-4 h-4" /> },
     { name: "Premium", href: "/premium", icon: <Sparkles className="w-4 h-4" />, color: "text-orange-500" },
   ];
 
