@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { MessageSquare, ThumbsUp, Eye, Search, User, Clock, Tag } from "lucide-react";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function DiscussPage() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -32,7 +33,12 @@ export default function DiscussPage() {
                 <p className="text-zinc-500 font-medium">Share insights, ask questions, and build together.</p>
             </div>
             <div className="flex gap-3 w-full md:w-auto">
-                <button className="flex-1 md:flex-none px-8 py-3.5 bg-white text-black rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-zinc-200 transition-all shadow-xl active:scale-95">New Post</button>
+                <Link 
+                  href="/discuss/new"
+                  className="flex-1 md:flex-none px-8 py-3.5 bg-white text-black rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-zinc-200 transition-all shadow-xl active:scale-95 flex items-center justify-center"
+                >
+                  New Post
+                </Link>
                 <button className="flex-1 md:flex-none px-8 py-3.5 bg-zinc-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest border border-white/5 hover:bg-zinc-800 transition-all active:scale-95">Filter</button>
             </div>
         </div>
