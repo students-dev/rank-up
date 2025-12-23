@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Code2, LogOut, User as UserIcon, LayoutGrid, Trophy as TrophyIcon, Sparkles, HelpCircle } from "lucide-react";
+import { Code2, LogOut, User as UserIcon, LayoutGrid, Trophy as TrophyIcon, Sparkles, HelpCircle, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Navbar = () => {
@@ -22,17 +22,20 @@ const Navbar = () => {
               </span>
             </Link>
 
-            <div className="hidden lg:flex items-center gap-6">
-              <Link href="/problems" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors flex items-center gap-2">
+            <div className="hidden xl:flex items-center gap-6">
+              <Link href="/problems" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors">
                 Problems
               </Link>
-              <Link href="/leaderboard" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors flex items-center gap-2">
+              <Link href="/leaderboard" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors">
                 Leaderboard
               </Link>
-              <Link href="/changelog" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors flex items-center gap-2">
+              <Link href="/faq" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors">
+                FAQ
+              </Link>
+              <Link href="/changelog" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors">
                 Changelog
               </Link>
-              <Link href="/about" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors flex items-center gap-2">
+              <Link href="/about" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors">
                 About
               </Link>
             </div>
@@ -41,6 +44,9 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             {session ? (
               <div className="flex items-center gap-4">
+                <Link href="/settings" className="p-2 text-zinc-500 hover:text-white transition-colors">
+                  <Settings className="w-4 h-4" />
+                </Link>
                 <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-white/10 hover:bg-zinc-800 transition-all">
                   <div className="w-5 h-5 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center overflow-hidden">
                     {session.user?.image ? (
