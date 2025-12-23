@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
-import { ArrowRight, Terminal, Trophy, Sparkles, Command } from "lucide-react";
+import { ArrowRight, Terminal, Sparkles, Command } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export default function Home() {
   const fadeInUp: Variants = {
@@ -30,25 +31,20 @@ export default function Home() {
         initial="initial"
         animate="animate"
         variants={stagger}
-        className="relative z-10 max-w-6xl mx-auto px-8 pt-32 pb-40"
+        className="relative z-10 max-w-6xl mx-auto px-8 pt-32 pb-40 flex flex-col items-center"
       >
-        <motion.div variants={fadeInUp} className="flex justify-center mb-12">
-          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-zinc-900/50 border border-white/5 text-zinc-400 text-xs font-medium shadow-2xl backdrop-blur-md">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
-            </span>
-            Engineering OS v1.2.1
-          </div>
+        <motion.div variants={fadeInUp} className="mb-12">
+          <Logo className="w-20 h-20 filter drop-shadow-[0_0_20px_rgba(249,115,22,0.3)]" />
         </motion.div>
 
         <motion.div variants={fadeInUp} className="text-center space-y-8 mb-20">
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white leading-[1.1]">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white leading-[1.1] max-w-4xl mx-auto">
             Accelerate your coding <br />
             <span className="text-zinc-500">proficiency with</span> <span className="text-orange-500">Rank-up.</span>
           </h1>
           <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto font-medium leading-relaxed">
-            The premium platform for modern engineers to master algorithms, compete in real-time, and elevate their technical skills.
+            The premium cloud platform for modern engineers to master algorithms, <br className="hidden md:block" />
+            compete in real-time, and elevate their technical skills.
           </p>
         </motion.div>
 
@@ -67,9 +63,10 @@ export default function Home() {
           </Link>
         </motion.div>
 
+        {/* Feature Grid */}
         <motion.div 
           variants={stagger}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full"
         >
           {[
             {
@@ -83,7 +80,7 @@ export default function Home() {
               desc: "Intelligent hints and optimization suggestions to guide your engineering journey."
             },
             {
-              icon: <Trophy className="w-5 h-5 text-emerald-500" />,
+              icon: <TrophyIcon className="w-5 h-5 text-emerald-500" />,
               title: "Global Community",
               desc: "Climb the ranks from Bronze to Diamond in real-time competitive coding matches."
             }
@@ -105,4 +102,8 @@ export default function Home() {
       </motion.div>
     </div>
   );
+}
+
+function TrophyIcon(props: any) {
+  return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
 }

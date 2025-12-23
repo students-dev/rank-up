@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { 
-  Code2, LogOut, User as UserIcon, LayoutGrid, Trophy as TrophyIcon, 
-  Sparkles, HelpCircle, Settings, ChevronDown, Compass, BookOpen, 
-  MessageSquare, Briefcase, Award, Users, Info, GitBranch, Mail, Users2 
+  LogOut, User as UserIcon, ChevronDown, Compass, BookOpen, 
+  MessageSquare, Briefcase, Award, Users, Info, GitBranch, Mail, Users2, Settings 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { Logo } from "./Logo";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -31,15 +31,13 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="sticky top-0 z-[100] h-16 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl">
+    <nav className="sticky top-0 z-[100] h-16 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div className="flex justify-between h-full items-center">
           <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="bg-white p-1.5 rounded-lg shadow-sm">
-                <Code2 className="w-4 h-4 text-black" />
-              </div>
-              <span className="text-lg font-semibold tracking-tight text-white">
+            <Link href="/" className="flex items-center gap-3 group">
+              <Logo className="w-7 h-7 group-hover:scale-110 transition-transform duration-300" />
+              <span className="text-xl font-bold tracking-tight text-white group-hover:text-orange-500 transition-colors">
                 Rankup
               </span>
             </Link>
@@ -102,7 +100,7 @@ const Navbar = () => {
                       <UserIcon className="w-3 h-3 text-zinc-400" />
                     )}
                   </div>
-                  <span className="text-xs font-medium text-zinc-300">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300">
                     {session.user?.name?.split(' ')[0]}
                   </span>
                 </Link>
@@ -127,5 +125,17 @@ const Navbar = () => {
     </nav>
   );
 };
+
+function TrophyIcon(props: any) {
+  return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
+}
+
+function HelpCircle(props: any) {
+  return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>;
+}
+
+function Sparkles(props: any) {
+  return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>;
+}
 
 export default Navbar;
