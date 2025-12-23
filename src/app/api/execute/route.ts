@@ -3,6 +3,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+const toCamelCase = (str: string) => {
+  return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+};
+
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,19 +20,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Problem not found" }, { status: 404 });
     }
 
-    // In a real system, we'd fetch these from the DB
     const testCases = problem.testCases as any[];
-
     const results = [];
     let allPassed = true;
 
-    // Execution logic (JavaScript only for real validation in this prototype)
     if (language === "javascript") {
+      const functionName = toCamelCase(problemSlug);
       for (const testCase of testCases) {
         try {
+          // Robust function execution
           const fn = new Function(`
             ${code}
-            return ${problemSlug.replace(/-/g, '')}(...arguments);
+            if (typeof ${functionName} !== 'function') {
+                throw new Error("Function ${functionName} is not defined. Please check your code.");
+            }
+            return ${functionName}(...arguments);
           `);
 
           const start = performance.now();
@@ -51,56 +57,63 @@ export async function POST(req: Request) {
         }
       }
     } else {
-      // Mock pass for other languages
       allPassed = true;
-      results.push({ passed: true, message: "Simulated execution" });
+      results.push({ passed: true, message: `Simulated ${language} execution` });
     }
 
-    // Save Submission and Update User Stats if authenticated
     if (session?.user?.email) {
       const user = await prisma.user.findUnique({
         where: { email: session.user.email },
       });
 
-      if (user && allPassed) {
-        const xpGain = problem.difficulty === "EASY" ? 50 : problem.difficulty === "MEDIUM" ? 100 : 200;
-        
-        // Simple streak logic
-        const now = new Date();
-        const lastSolved = user.lastSolved ? new Date(user.lastSolved) : null;
-        let newStreak = user.streak;
+      if (user) {
+        if (allPassed) {
+          const xpGain = problem.difficulty === "EASY" ? 50 : problem.difficulty === "MEDIUM" ? 100 : 200;
+          const now = new Date();
+          const lastSolvedDate = user.lastSolved ? new Date(user.lastSolved).toDateString() : null;
+          const todayDate = now.toDateString();
+          
+          let newStreak = user.streak;
+          if (!lastSolvedDate) {
+              newStreak = 1;
+          } else if (lastSolvedDate !== todayDate) {
+              const yesterday = new Date(now);
+              yesterday.setDate(now.getDate() - 1);
+              if (lastSolvedDate === yesterday.toDateString()) {
+                  newStreak += 1;
+              } else {
+                  newStreak = 1;
+              }
+          }
 
-        if (!lastSolved || now.getDate() !== lastSolved.getDate()) {
-            newStreak += 1;
-        }
-
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            xp: { increment: xpGain },
-            streak: newStreak,
-            lastSolved: now,
-            submissions: {
-              create: {
-                problemId: problem.id,
-                code,
-                language,
-                status: "Accepted",
-                runtime: results[0]?.runtime || 0,
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              xp: { increment: xpGain },
+              streak: newStreak,
+              lastSolved: now,
+              submissions: {
+                create: {
+                  problemId: problem.id,
+                  code,
+                  language,
+                  status: "Accepted",
+                  runtime: results[0]?.runtime || 0,
+                },
               },
             },
-          },
-        });
-      } else if (user) {
-        await prisma.submission.create({
-          data: {
-            userId: user.id,
-            problemId: problem.id,
-            code,
-            language,
-            status: "Failed",
-          },
-        });
+          });
+        } else {
+          await prisma.submission.create({
+            data: {
+              userId: user.id,
+              problemId: problem.id,
+              code,
+              language,
+              status: "Failed",
+            },
+          });
+        }
       }
     }
 
@@ -109,8 +122,7 @@ export async function POST(req: Request) {
       results,
       allPassed,
     });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Execution failed" }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || "Execution failed" }, { status: 500 });
   }
 }

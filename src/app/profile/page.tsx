@@ -16,16 +16,25 @@ export default async function ProfilePage() {
     include: {
       submissions: {
         orderBy: { createdAt: "desc" },
-        take: 5,
+        take: 10,
         include: { problem: true },
       },
+      _count: {
+        select: { submissions: { where: { status: "Accepted" } } }
+      }
     },
   });
 
   if (!user) return null;
 
+  const solvedCount = user._count.submissions;
+  const level = Math.floor((user.xp || 0) / 1000) + 1;
+  const accuracy = user.submissions.length > 0 
+    ? Math.round((solvedCount / user.submissions.length) * 100) 
+    : 0;
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12 font-sans bg-zinc-950">
+    <div className="max-w-6xl mx-auto px-6 py-12 font-sans bg-zinc-950 min-h-screen">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="space-y-6">
           <div className="bg-zinc-900 border border-white/5 rounded-[32px] p-8 flex flex-col items-center text-center relative overflow-hidden group">
@@ -49,7 +58,7 @@ export default async function ProfilePage() {
               </div>
               <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
                 <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1">XP</p>
-                <p className="text-xl font-bold text-orange-500">{user.xp || 0}</p>
+                <p className="text-xl font-bold text-orange-500">{user.xp.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -67,7 +76,7 @@ export default async function ProfilePage() {
                 <Zap className="w-4 h-4 text-blue-500 fill-current" />
                 Level
               </h3>
-              <span className="text-2xl font-bold text-white">{Math.floor((user.xp || 0) / 1000) + 1}</span>
+              <span className="text-2xl font-bold text-white">{level}</span>
             </div>
           </div>
 
@@ -77,13 +86,13 @@ export default async function ProfilePage() {
               Achievements
             </h3>
             <div className="flex flex-wrap gap-3">
-               <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center opacity-20 grayscale transition-all hover:opacity-100 hover:grayscale-0 cursor-help" title="Early Adopter">
+               <div className={`w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center transition-all ${solvedCount > 0 ? 'opacity-100 grayscale-0' : 'opacity-20 grayscale'}`} title="First Problem Solved">
                   <Star className="w-6 h-6 text-yellow-500" />
                </div>
-               <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center opacity-20 grayscale" title="10 Problems Solved">
+               <div className={`w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center transition-all ${solvedCount >= 5 ? 'opacity-100 grayscale-0' : 'opacity-20 grayscale'}`} title="5 Problems Solved">
                   <Code className="w-6 h-6 text-blue-500" />
                </div>
-               <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center opacity-20 grayscale" title="First Streak">
+               <div className={`w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center transition-all ${user.streak >= 3 ? 'opacity-100 grayscale-0' : 'opacity-20 grayscale'}`} title="3 Day Streak">
                   <Flame className="w-6 h-6 text-orange-500" />
                </div>
             </div>
@@ -91,11 +100,32 @@ export default async function ProfilePage() {
         </div>
 
         <div className="lg:col-span-2 space-y-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-zinc-900 border border-white/5 p-8 rounded-[32px] group hover:border-emerald-500/30 transition-colors">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="bg-emerald-500/10 p-2.5 rounded-xl group-hover:bg-emerald-500/20 transition-colors">
+                  <Code className="w-5 h-5 text-emerald-500" />
+                </div>
+                <h4 className="font-black text-xs uppercase tracking-widest text-zinc-400">Total Solved</h4>
+              </div>
+              <p className="text-4xl font-black text-white">{solvedCount}</p>
+            </div>
+            <div className="bg-zinc-900 border border-white/5 p-8 rounded-[32px] group hover:border-blue-500/30 transition-colors">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="bg-blue-500/10 p-2.5 rounded-xl group-hover:bg-blue-500/20 transition-colors">
+                  <Trophy className="w-5 h-5 text-blue-500" />
+                </div>
+                <h4 className="font-black text-xs uppercase tracking-widest text-zinc-400">Accuracy</h4>
+              </div>
+              <p className="text-4xl font-black text-white">{accuracy}%</p>
+            </div>
+          </div>
+
           <div className="bg-zinc-900 border border-white/5 rounded-[32px] overflow-hidden">
             <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
               <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-orange-500" />
-                Recent Submissions
+                Recent Activity
               </h3>
             </div>
             <div className="divide-y divide-white/5">
@@ -105,23 +135,19 @@ export default async function ProfilePage() {
                     <div className="space-y-1">
                       <h5 className="font-semibold text-white group-hover:text-orange-500 transition-colors tracking-tight">{sub.problem.title}</h5>
                       <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-zinc-600">
-                        {new Date(sub.createdAt).toLocaleDateString()} at {new Date(sub.createdAt).toLocaleTimeString()}
+                        {new Date(sub.createdAt).toLocaleDateString()} • {sub.language.toUpperCase()}
                       </p>
                     </div>
-                    <div className="flex items-center gap-6">
-                        <span className="text-xs font-bold text-zinc-500">{sub.language.toUpperCase()}</span>
-                        <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
-                          sub.status === "Accepted" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                        }`}>
-                          {sub.status}
-                        </span>
-                    </div>
+                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
+                      sub.status === "Accepted" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                    }`}>
+                      {sub.status}
+                    </span>
                   </div>
                 ))
               ) : (
                 <div className="p-20 text-center space-y-4">
-                  <p className="text-zinc-600 italic font-medium">No submissions yet.</p>
-                  <button className="text-xs font-black uppercase tracking-widest text-white px-6 py-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all">Start Solving</button>
+                  <p className="text-zinc-600 italic font-medium">No activity yet.</p>
                 </div>
               )}
             </div>
