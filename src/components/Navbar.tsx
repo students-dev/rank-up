@@ -39,23 +39,23 @@ const Navbar = () => {
               <div className="bg-white p-1.5 rounded-lg shadow-sm">
                 <Code2 className="w-4 h-4 text-black" />
               </div>
-              <span className="text-lg font-semibold tracking-tight text-white uppercase italic">
-                Rank<span className="text-orange-500">up</span>
+              <span className="text-lg font-semibold tracking-tight text-white">
+                Rankup
               </span>
             </Link>
 
             <div className="hidden lg:flex items-center gap-6">
-              <Link href="/problems" className="text-[13px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">
+              <Link href="/problems" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors">
                 Problems
               </Link>
-              <Link href="/leaderboard" className="text-[13px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">
+              <Link href="/leaderboard" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors">
                 Leaderboard
               </Link>
               
               <div className="relative">
                 <button 
                   onMouseEnter={() => setIsMoreOpen(true)}
-                  className="text-[13px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition-colors flex items-center gap-1 cursor-pointer py-4"
+                  className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors flex items-center gap-1 cursor-pointer py-4"
                 >
                   More <ChevronDown className={`w-3 h-3 transition-transform ${isMoreOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -67,14 +67,14 @@ const Navbar = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       onMouseLeave={() => setIsMoreOpen(false)}
-                      className="absolute top-full left-0 mt-0 w-64 glass-darker p-2 rounded-2xl shadow-2xl border border-white/10 overflow-hidden"
+                      className="absolute top-full left-0 mt-0 w-64 glass-darker p-2 rounded-2xl shadow-2xl border border-white/10 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                     >
                       <div className="grid grid-cols-1 gap-1 max-h-[70vh] overflow-y-auto custom-scrollbar">
                         {moreLinks.map((link) => (
                           <Link
                             key={link.name}
                             href={link.href}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-all ${link.color || 'text-zinc-500 hover:text-white'}`}
+                            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium hover:bg-white/5 transition-all ${link.color || 'text-zinc-400 hover:text-white'}`}
                           >
                             <span className="shrink-0">{link.icon}</span>
                             {link.name}
@@ -102,7 +102,7 @@ const Navbar = () => {
                       <UserIcon className="w-3 h-3 text-zinc-400" />
                     )}
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300">
+                  <span className="text-xs font-medium text-zinc-300">
                     {session.user?.name?.split(' ')[0]}
                   </span>
                 </Link>
@@ -116,7 +116,7 @@ const Navbar = () => {
             ) : (
               <button
                 onClick={() => signIn()}
-                className="bg-white text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-zinc-200 transition-all"
+                className="bg-white text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-zinc-200 transition-all"
               >
                 Sign In
               </button>
