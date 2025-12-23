@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Rank-up | Elevate Your Coding Skills",
-  description: "A premium LeetCode clone for practicing coding challenges.",
+  description: "The premium engineering platform for mastering algorithms and data structures.",
 };
 
 export default function RootLayout({

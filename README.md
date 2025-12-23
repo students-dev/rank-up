@@ -1,6 +1,6 @@
 # Rank-up
 
-A premium LeetCode clone built with Next.js, optimized for Vercel.
+The premium engineering platform for mastering algorithms and data structures, built with Next.js and optimized for Vercel.
 
 ## Features
 - 🔐 **Authentication:** GitHub & Google OAuth via NextAuth.js.
