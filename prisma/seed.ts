@@ -1,5 +1,6 @@
 import { PrismaClient, Difficulty } from "@prisma/client";
 import { withAccelerate } from "@prisma/extension-accelerate";
+import bcrypt from "bcryptjs";
 
 // @ts-ignore
 const prisma = new PrismaClient({
@@ -7,6 +8,19 @@ const prisma = new PrismaClient({
 }).$extends(withAccelerate());
 
 async function main() {
+  const hashedPassword = await bcrypt.hash("ramdev", 10);
+  
+  await prisma.user.upsert({
+    where: { email: "ramkrisna@rankup.com" },
+    update: {},
+    create: {
+      name: "Ramkrisna",
+      email: "ramkrisna@rankup.com",
+      password: hashedPassword,
+      role: "ADMIN",
+    },
+  });
+
   const problems = [
     {
       title: "Two Sum",
@@ -92,7 +106,21 @@ async function main() {
     });
   }
 
-  console.log("Database seeded with 4 problems successfully!");
+  // Create a sample contest
+  await prisma.contest.upsert({
+    where: { id: "cl123456789" },
+    update: {},
+    create: {
+      id: "cl123456789",
+      title: "Weekly Contest 432",
+      description: "Our flagship weekly competition featuring four algorithms of increasing difficulty.",
+      startTime: new Date("2025-12-28T08:00:00Z"),
+      endTime: new Date("2025-12-28T10:00:00Z"),
+      problems: ["two-sum", "is-palindrome", "is-valid", "longest-common-prefix"],
+    },
+  });
+
+  console.log("Database seeded successfully with admin user, problems, and a contest!");
 }
 
 main()

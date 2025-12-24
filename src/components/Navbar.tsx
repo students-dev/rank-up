@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import { 
   ChevronDown, Compass, BookOpen, 
-  MessageSquare, Briefcase, Award, Users, Info, GitBranch, Mail, Users2
+  MessageSquare, Briefcase, Award, Users, Info, GitBranch, Mail, Users2,
+  Menu, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
@@ -15,6 +16,7 @@ import { NavbarSearch } from "./navbar/NavbarSearch";
 const Navbar = () => {
   const { data: session } = useSession();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const moreLinks = [
     { name: "Explore", href: "/explore", icon: <Compass className="w-4 h-4" /> },
@@ -32,25 +34,36 @@ const Navbar = () => {
     { name: "Premium", href: "/premium", icon: <SparklesIcon className="w-4 h-4" />, color: "text-orange-500" },
   ];
 
+  const mainLinks = [
+    { name: "Problems", href: "/problems" },
+    { name: "Leaderboard", href: "/leaderboard" },
+  ];
+
   return (
     <nav className="sticky top-0 z-[100] h-16 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-        <div className="flex justify-between h-full items-center gap-8">
-          <div className="flex items-center gap-8 shrink-0">
+        <div className="flex justify-between h-full items-center gap-4 md:gap-8">
+          <div className="flex items-center gap-4 md:gap-8 shrink-0">
+            <button 
+              className="lg:hidden p-2 text-zinc-400 hover:text-white"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
             <Link href="/" className="flex items-center gap-3 group">
               <Logo className="w-7 h-7 group-hover:scale-110 transition-transform duration-300" />
-              <span className="text-xl font-bold tracking-tight text-white group-hover:text-orange-500 transition-colors hidden sm:block">
+              <span className="text-xl font-bold tracking-tight text-white group-hover:text-orange-500 transition-colors hidden xs:block">
                 Rankup
               </span>
             </Link>
 
             <div className="hidden lg:flex items-center gap-6">
-              <Link href="/problems" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors">
-                Problems
-              </Link>
-              <Link href="/leaderboard" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors">
-                Leaderboard
-              </Link>
+              {mainLinks.map((link) => (
+                <Link key={link.name} href={link.href} className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors">
+                  {link.name}
+                </Link>
+              ))}
               
               <div className="relative">
                 <button 
@@ -89,7 +102,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          <div className="flex-1 flex justify-center max-w-xl">
+          <div className="flex-1 hidden sm:flex justify-center max-w-xl">
             <NavbarSearch />
           </div>
 
@@ -107,6 +120,75 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden"
+            />
+            <motion.div 
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 left-0 bottom-0 w-[280px] bg-zinc-950 border-r border-white/10 z-[100] lg:hidden overflow-y-auto custom-scrollbar"
+            >
+              <div className="p-6 space-y-8">
+                <div className="flex items-center justify-between">
+                  <Link href="/" className="flex items-center gap-3" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Logo className="w-7 h-7" />
+                    <span className="text-xl font-bold text-white">Rankup</span>
+                  </Link>
+                  <button onClick={() => setIsMobileMenuOpen(false)} className="text-zinc-400 hover:text-white">
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+
+                <div className="sm:hidden">
+                  <NavbarSearch />
+                </div>
+
+                <div className="space-y-2">
+                  <p className="px-4 text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Main</p>
+                  {mainLinks.map((link) => (
+                    <Link
+                      key={link.name}
+                      href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-zinc-400 hover:bg-white/5 hover:text-white transition-all"
+                    >
+                      {link.name}
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="space-y-2">
+                  <p className="px-4 text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Explore</p>
+                  <div className="grid grid-cols-1 gap-1">
+                    {moreLinks.map((link) => (
+                      <Link
+                        key={link.name}
+                        href={link.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5 transition-all ${link.color || 'text-zinc-400 hover:text-white'}`}
+                      >
+                        <span className="shrink-0">{link.icon}</span>
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };

@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { VoteButtons } from "@/components/VoteButtons";
 
+import { PageTransition } from "@/components/PageTransition";
+
 export default function DiscussPage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,28 +28,29 @@ export default function DiscussPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-zinc-950 grid-pattern font-sans">
-      <div className="max-w-5xl mx-auto px-6 pt-24 pb-32 relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-8">
+    <PageTransition>
+    <div className="relative min-h-screen bg-zinc-950 grid-pattern font-sans overflow-x-hidden">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 md:pt-24 pb-32 relative z-10">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 md:mb-16 gap-8">
             <div className="space-y-2">
-                <h1 className="text-4xl font-bold text-white tracking-tight">Community</h1>
-                <p className="text-zinc-500 font-medium">Share insights, ask questions, and build together.</p>
+                <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">Community</h1>
+                <p className="text-zinc-500 font-medium text-sm md:text-base">Share insights, ask questions, and build together with engineers worldwide.</p>
             </div>
             <div className="flex gap-3 w-full md:w-auto">
                 <Link 
                   href="/discuss/new"
-                  className="flex-1 md:flex-none px-8 py-3.5 bg-white text-black rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-zinc-200 transition-all shadow-xl active:scale-95 flex items-center justify-center"
+                  className="flex-1 md:flex-none px-6 md:px-8 py-3.5 bg-white text-black rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-zinc-200 transition-all shadow-xl active:scale-95 flex items-center justify-center whitespace-nowrap"
                 >
                   New Post
                 </Link>
-                <button className="flex-1 md:flex-none px-8 py-3.5 bg-zinc-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest border border-white/5 hover:bg-zinc-800 transition-all active:scale-95">Filter</button>
+                <button className="flex-1 md:flex-none px-6 md:px-8 py-3.5 bg-zinc-900 text-white rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest border border-white/5 hover:bg-zinc-800 transition-all active:scale-95">Filter</button>
             </div>
         </div>
 
-        <div className="grid gap-4">
+        <div className="grid gap-4 md:gap-6">
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-40 bg-zinc-900/50 rounded-[32px] border border-white/5 animate-pulse" />
+                <div key={i} className="h-40 bg-zinc-900/50 rounded-[32px] md:rounded-[40px] border border-white/5 animate-pulse" />
             ))
           ) : posts.length > 0 ? (
             posts.map((post, i) => (
@@ -56,28 +59,30 @@ export default function DiscussPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="p-8 rounded-[40px] bg-zinc-900/40 border border-white/5 hover:border-white/10 transition-all group shadow-sm hover:shadow-2xl"
+                  className="p-6 md:p-10 rounded-[32px] md:rounded-[48px] bg-zinc-900/40 border border-white/5 hover:border-white/10 transition-all group shadow-sm hover:shadow-2xl overflow-hidden"
                 >
-                  <div className="flex flex-col md:flex-row gap-8">
+                  <div className="flex flex-col md:flex-row gap-6 md:gap-10">
                     {/* Voting Column */}
-                    <VoteButtons 
-                        initialLikes={post.likes} 
-                        postId={post.id} 
-                        initialUserVote={post.userVote}
-                    />
+                    <div className="flex md:block">
+                        <VoteButtons 
+                            initialLikes={post.likes} 
+                            postId={post.id} 
+                            initialUserVote={post.userVote}
+                        />
+                    </div>
 
                     <div className="flex-1 space-y-6">
                         <Link href={`/discuss/${post.id}`}>
-                            <div className="space-y-4">
+                            <div className="space-y-4 md:space-y-6">
                                 <div className="flex flex-wrap gap-2">
                                     {post.tags.map((tag: string, j: number) => (
-                                    <span key={j} className="text-[9px] font-black uppercase tracking-widest text-zinc-500 border border-white/5 px-2.5 py-1 rounded-lg bg-white/[0.02]">
+                                    <span key={j} className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-zinc-500 border border-white/5 px-2.5 py-1 rounded-lg bg-white/[0.02]">
                                         {tag}
                                     </span>
                                     ))}
                                 </div>
-                                <h3 className="text-2xl font-bold text-white group-hover:text-orange-500 transition-colors leading-tight tracking-tight">{post.title}</h3>
-                                <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-zinc-600">
+                                <h3 className="text-xl md:text-3xl font-black text-white group-hover:text-orange-500 transition-colors leading-tight tracking-tight">{post.title}</h3>
+                                <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-zinc-600">
                                     <div className="flex items-center gap-2">
                                         <div className="w-5 h-5 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center overflow-hidden">
                                             {post.author.image ? <img src={post.author.image} alt="" /> : <User className="w-3 h-3" />}
@@ -85,14 +90,14 @@ export default function DiscussPage() {
                                         <span className="text-zinc-400">{post.author.name}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <Clock className="w-3.5 h-3.5" />
+                                        <Clock className="w-3.5 h-3.5 text-zinc-700" />
                                         <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-orange-500/50">
                                         <MessageSquare className="w-3.5 h-3.5" />
                                         <span>{post._count.comments} Comments</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 hidden sm:flex">
                                         <Eye className="w-3.5 h-3.5" />
                                         <span>{post.views} Views</span>
                                     </div>
@@ -112,5 +117,6 @@ export default function DiscussPage() {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

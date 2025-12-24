@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 export const Logo = ({ className = "w-8 h-8" }: { className?: string }) => {
   return (
@@ -29,13 +30,23 @@ export const Logo = ({ className = "w-8 h-8" }: { className?: string }) => {
       />
       
       {/* Stylized 'R' with built-in Upward Arrow */}
-      <path
+      <motion.path
         d="M38 65V35H55C62 35 65 40 65 45C65 50 62 55 55 55H38M52 55L65 70"
         stroke="url(#rankup-gradient)"
         strokeWidth="8"
         strokeLinecap="round"
         strokeLinejoin="round"
         filter="url(#glow)"
+        animate={{
+          strokeDasharray: ["0, 1000", "1000, 0"],
+          strokeDashoffset: [0, -1000],
+          opacity: [0.8, 1, 0.8],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "linear"
+        }}
       />
       
       {/* Minimalist Top Accent */}
